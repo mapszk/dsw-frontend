@@ -9,11 +9,10 @@ Aplicación web (SPA) del trabajo práctico de **Desarrollo de Software** (UTN).
 ## Índice
 
 1. [Stack tecnológico](#stack-tecnológico)
-2. [Instalación y ejecución local (Docker)](#instalación-y-ejecución-local-docker)
-3. [Ejecución sin Docker](#ejecución-sin-docker)
-4. [Comandos útiles](#comandos-útiles)
-5. [Estructura del proyecto](#estructura-del-proyecto)
-6. [Reglas del equipo](#reglas-del-equipo)
+2. [Instalación y ejecución local](#instalación-y-ejecución-local)
+3. [Comandos útiles](#comandos-útiles)
+4. [Estructura del proyecto](#estructura-del-proyecto)
+5. [Reglas del equipo](#reglas-del-equipo)
 
 ## Stack tecnológico
 
@@ -25,17 +24,17 @@ Aplicación web (SPA) del trabajo práctico de **Desarrollo de Software** (UTN).
 - React Hook Form + Zod
 - Vitest + Testing Library
 - ESLint + Prettier
-- Docker + Docker Compose
 
-## Instalación y ejecución local (Docker)
+## Instalación y ejecución local
 
 El frontend necesita la API corriendo. Primero levantá [dsw-api](https://github.com/mapszk/dsw-api#instalación-y-ejecución-local-docker) siguiendo su README (queda en `http://localhost:3000`).
 
 ### Requisitos previos
 
 - [Git](https://git-scm.com/downloads)
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/) (Windows / macOS) o Docker Engine + Docker Compose (Linux)
-- Opcional: [Node.js 22](https://nodejs.org/)
+- [Node.js 22](https://nodejs.org/) (incluye npm)
+
+Verificá la versión con `node -v` (debe ser 22.12 o superior).
 
 ### Paso a paso
 
@@ -46,55 +45,43 @@ git clone https://github.com/mapszk/dsw-frontend.git
 cd dsw-frontend
 ```
 
-**2. Crear el archivo de variables de entorno**
+**2. Instalar dependencias**
+
+```bash
+npm install
+```
+
+**3. Crear el archivo de variables de entorno**
 
 ```bash
 cp .env.example .env
 ```
 
-**3. Levantar la aplicación**
+**4. Levantar la aplicación**
 
 ```bash
-docker compose up -d --build
+npm run dev
 ```
 
 Levanta el servidor de desarrollo de Vite con recarga automática al editar archivos de `src/`.
 
-**4. Abrir en el navegador**
+**5. Abrir en el navegador**
 
 <http://localhost:5173>
 
-La página de inicio muestra si la conexión con la API funciona ("API en línea").
-
-**5. Ver logs y detener**
-
-```bash
-docker compose logs -f web   # ver logs (Ctrl+C para salir)
-docker compose down          # detener
-```
+La página de inicio muestra si la conexión con la API funciona ("API en línea"). Para detener el servidor: `Ctrl+C` en la terminal.
 
 ### Cómo se conecta con la API
 
-El navegador llama a `/api/...` en el mismo origen (`localhost:5173`) y Vite reenvía esas llamadas a la API (proxy de desarrollo). Así no hay problemas de CORS. Dentro de Docker, el proxy apunta a `http://host.docker.internal:3000`, es decir, a la API corriendo en tu máquina.
+El navegador llama a `/api/...` en el mismo origen (`localhost:5173`) y Vite reenvía esas llamadas a la API configurada en `API_PROXY_TARGET` (proxy de desarrollo). Así no hay problemas de CORS.
 
 ### Problemas frecuentes
 
 - **"API sin conexión":** verificá que la API esté levantada (`curl http://localhost:3000/api/health`).
-- **Puerto 5173 ocupado:** detené el otro proceso o cambiá el puerto en `docker-compose.yml`.
-- **Instalé una dependencia nueva o cambió `package.json`:** `docker compose up -d --build -V` (`-V` recrea el volumen de `node_modules`).
-- **El hot reload no detecta cambios (Windows / macOS):** `docker compose restart web`.
-
-## Ejecución sin Docker
-
-```bash
-cp .env.example .env
-npm install
-npm run dev        # http://localhost:5173
-```
+- **Puerto 5173 ocupado:** Vite usa el siguiente puerto libre; revisá la URL que muestra la terminal.
+- **La API corre en otro puerto o máquina:** cambiá `API_PROXY_TARGET` en `.env` y reiniciá `npm run dev`.
 
 ## Comandos útiles
-
-Con Docker, anteponé `docker compose exec web` (ej: `docker compose exec web npm test`).
 
 | Comando                              | Descripción                                   |
 | ------------------------------------ | --------------------------------------------- |
@@ -122,9 +109,7 @@ dsw-frontend/
 │   ├── types/               # modelos del dominio y tipos de la API
 │   ├── router.tsx           # definición de rutas
 │   └── main.tsx             # punto de entrada
-├── docs/                    # documentación del TP
-├── docker-compose.yml
-└── Dockerfile
+└── docs/                    # documentación del TP
 ```
 
 ## Reglas del equipo

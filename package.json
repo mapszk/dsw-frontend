@@ -17,10 +17,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
-    "format:check": "prettier --check .",
-    "docker:up": "docker compose up -d --build -V",
-    "docker:down": "docker compose down",
-    "docker:logs": "docker compose logs -f web"
+    "format:check": "prettier --check ."
   },
   "license": "MIT",
   "dependencies": {
