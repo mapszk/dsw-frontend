@@ -89,9 +89,20 @@ El navegador llama a `/api/...` en el mismo origen (`localhost:5173`) y Vite ree
 | `npm run build`                      | Build de producción en `dist/`                |
 | `npm run preview`                    | Servir el build de producción localmente      |
 | `npm test`                           | Ejecutar tests                                |
+| `npm run test:e2e`                   | Ejecutar tests end-to-end (ver abajo)         |
 | `npm run lint` / `npm run format`    | Revisar estilo / formatear código             |
 | `npm run typecheck`                  | Verificar tipos de TypeScript                 |
 | `npx shadcn@latest add <componente>` | Agregar un componente de shadcn/ui            |
+
+### Tests end-to-end (Playwright)
+
+Recorren la aplicación en un navegador real (escritorio y celular), contra la API de verdad.
+
+1. Levantá la API y cargá el seed (`docker compose exec api npm run db:seed` en dsw-api): los tests usan `admin@dsw.com` y `cliente@dsw.com`.
+2. La primera vez, instalá el navegador: `npx playwright install chromium`.
+3. Ejecutá `npm run test:e2e`. Si `npm run dev` no está corriendo, Playwright lo levanta solo.
+
+El reporte queda en `playwright-report/` (`npx playwright show-report` para abrirlo).
 
 ## Estructura del proyecto
 
