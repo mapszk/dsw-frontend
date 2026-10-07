@@ -1,0 +1,47 @@
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
+import type { UsuarioPayload } from './usuario.schema';
+import { usuarioService } from './usuario.service';
+
+const key = ['usuarios'];
+
+export function useUsuarios() {
+  return useQuery({ queryKey: key, queryFn: usuarioService.list });
+}
+
+export function useCrearUsuario() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: usuarioService.create,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: key });
+      toast.success('Usuario creado');
+    },
+    onError: (error) => toast.error(error.message),
+  });
+}
+
+export function useActualizarUsuario() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: number; data: UsuarioPayload }) =>
+      usuarioService.update(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: key });
+      toast.success('Usuario actualizado');
+    },
+    onError: (error) => toast.error(error.message),
+  });
+}
+
+export function useEliminarUsuario() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: usuarioService.remove,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: key });
+      toast.success('Usuario eliminado');
+    },
+    onError: (error) => toast.error(error.message),
+  });
+}

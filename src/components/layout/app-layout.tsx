@@ -16,6 +16,7 @@ interface NavItem {
 
 const links: NavItem[] = [
   { to: '/', label: 'Inicio' },
+  { to: '/usuarios', label: 'Usuarios', roles: ['ADMIN'] },
   { to: '/tipos-vehiculo', label: 'Tipos de vehículo', roles: ['ADMIN'] },
   { to: '/tarifas', label: 'Tarifas', roles: ['ADMIN'] },
 ];
