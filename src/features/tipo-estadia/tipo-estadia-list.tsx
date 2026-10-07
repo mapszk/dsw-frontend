@@ -66,7 +66,6 @@ export function TipoEstadiaList({ tiposEstadia, onEdit, onDelete }: TipoEstadiaL
             <TableRow>
               <TableHead>Nombre</TableHead>
               <TableHead>Duración</TableHead>
-              <TableHead className="text-right">Minutos</TableHead>
               <TableHead className="text-right">Acciones</TableHead>
             </TableRow>
           </TableHeader>
@@ -75,7 +74,6 @@ export function TipoEstadiaList({ tiposEstadia, onEdit, onDelete }: TipoEstadiaL
               <TableRow key={tipoEstadia.id}>
                 <TableCell className="font-medium">{tipoEstadia.tipo}</TableCell>
                 <TableCell>{formatDuracion(tipoEstadia.duracionMinutos)}</TableCell>
-                <TableCell className="text-right">{tipoEstadia.duracionMinutos}</TableCell>
                 <TableCell>{acciones(tipoEstadia)}</TableCell>
               </TableRow>
             ))}
