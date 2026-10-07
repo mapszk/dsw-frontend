@@ -29,26 +29,24 @@ export interface Usuario {
   rol: Rol;
 }
 
-// Sigue el DTO de la API: sin timestamps
+// TipoVehiculo, TipoEstadia y Tarifa siguen los DTOs de la API: sin timestamps y montos como number
 export interface TipoVehiculo {
   id: number;
   tipo: string;
 }
 
-export interface TipoEstadia extends Timestamps {
+export interface TipoEstadia {
   id: number;
   tipo: string;
   duracionMinutos: number;
 }
 
-export interface Tarifa extends Timestamps {
+export interface Tarifa {
   id: number;
-  valor: string;
+  valor: number;
   fechaDesde: string;
-  tipoVehiculoId: number;
-  tipoEstadiaId: number;
-  tipoVehiculo?: TipoVehiculo;
-  tipoEstadia?: TipoEstadia;
+  tipoVehiculo: TipoVehiculo;
+  tipoEstadia: TipoEstadia;
 }
 
 export interface Playa extends Timestamps {

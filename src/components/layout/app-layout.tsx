@@ -17,6 +17,7 @@ interface NavItem {
 const links: NavItem[] = [
   { to: '/', label: 'Inicio' },
   { to: '/tipos-vehiculo', label: 'Tipos de vehículo', roles: ['ADMIN'] },
+  { to: '/tarifas', label: 'Tarifas', roles: ['ADMIN'] },
 ];
 
 export function AppLayout() {

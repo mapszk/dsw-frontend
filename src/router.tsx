@@ -5,6 +5,7 @@ import { HomePage } from '@/pages/home-page';
 import { LoginPage } from '@/pages/login-page';
 import { NotFoundPage } from '@/pages/not-found-page';
 import { RegistroPage } from '@/pages/registro-page';
+import { TarifasPage } from '@/pages/tarifas-page';
 import { TiposVehiculoPage } from '@/pages/tipos-vehiculo-page';
 
 export const router = createBrowserRouter([
@@ -25,7 +26,10 @@ export const router = createBrowserRouter([
       },
       {
         element: <RequireAuth roles={['ADMIN']} />,
-        children: [{ path: '/tipos-vehiculo', element: <TiposVehiculoPage /> }],
+        children: [
+          { path: '/tipos-vehiculo', element: <TiposVehiculoPage /> },
+          { path: '/tarifas', element: <TarifasPage /> },
+        ],
       },
       { path: '*', element: <NotFoundPage /> },
     ],
