@@ -8,7 +8,7 @@ import { useCrearReserva } from '@/features/reserva/use-reservas';
 import { useTiposEstadia } from '@/features/tipo-estadia/use-tipos-estadia';
 import { useTiposVehiculo } from '@/features/tipo-vehiculo/use-tipos-vehiculo';
 import { useUsuarios } from '@/features/usuario/use-usuarios';
-import { formatDuracion } from '@/lib/format';
+import { formatDuracion } from '@/lib/duracion';
 
 /** Adapta una query de TanStack al formato de opciones del select */
 function toOpciones<T>(

@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { formatDuracion, formatFechaHora, formatMoneda } from '@/lib/format';
+import { formatDuracion } from '@/lib/duracion';
+import { formatFechaHora, formatMoneda } from '@/lib/format';
 import type { MetodoPago, Reserva } from '@/types/models';
 
 const METODO_PAGO_LABEL: Record<MetodoPago, string> = {

@@ -8,7 +8,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { formatDuracion } from '@/lib/format';
+import { formatDuracion } from '@/lib/duracion';
 import type { TipoEstadia } from '@/types/models';
 
 interface TipoEstadiaListProps {
