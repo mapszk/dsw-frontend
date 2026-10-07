@@ -19,7 +19,8 @@ interface Timestamps {
   updatedAt: string;
 }
 
-export interface Usuario extends Timestamps {
+// La API no devuelve timestamps ni password de los usuarios
+export interface Usuario {
   id: number;
   nombre: string;
   telefono: string | null;
