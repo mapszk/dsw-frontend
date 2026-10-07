@@ -63,22 +63,24 @@ export interface Cochera extends Timestamps {
   playa?: Playa;
 }
 
-export interface Reserva extends Timestamps {
+// Igual al ReservaDto de la API (dsw-api: reserva.dto.ts)
+export interface Reserva {
   id: number;
   patente: string;
   fechaInicio: string;
   fechaFin: string;
-  precioTotal: string;
+  precioTotal: number;
   estado: EstadoReserva;
-  usuarioId: number;
-  cocheraId: number;
-  tipoVehiculoId: number;
-  tipoEstadiaId: number;
-  usuario?: Usuario;
-  cochera?: Cochera;
-  tipoVehiculo?: TipoVehiculo;
-  tipoEstadia?: TipoEstadia;
-  pago?: Pago | null;
+  usuario: Usuario;
+  cochera: {
+    id: number;
+    techada: boolean;
+    estado: EstadoCochera;
+    playa: { id: number; sector: string };
+  };
+  tipoVehiculo: TipoVehiculo;
+  tipoEstadia: TipoEstadia;
+  pago: { id: number; fecha: string; metodo: MetodoPago; monto: number } | null;
 }
 
 export interface Pago extends Timestamps {
