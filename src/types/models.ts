@@ -29,7 +29,8 @@ export interface Usuario {
   rol: Rol;
 }
 
-export interface TipoVehiculo extends Timestamps {
+// Sigue el DTO de la API: sin timestamps
+export interface TipoVehiculo {
   id: number;
   tipo: string;
 }

@@ -5,6 +5,7 @@ import { HomePage } from '@/pages/home-page';
 import { LoginPage } from '@/pages/login-page';
 import { NotFoundPage } from '@/pages/not-found-page';
 import { RegistroPage } from '@/pages/registro-page';
+import { TiposVehiculoPage } from '@/pages/tipos-vehiculo-page';
 
 export const router = createBrowserRouter([
   {
@@ -21,6 +22,10 @@ export const router = createBrowserRouter([
         // Cualquier usuario logueado. Las secciones de un solo rol van en <RequireAuth roles={[...]} />
         element: <RequireAuth />,
         children: [{ path: '/', element: <HomePage /> }],
+      },
+      {
+        element: <RequireAuth roles={['ADMIN']} />,
+        children: [{ path: '/tipos-vehiculo', element: <TiposVehiculoPage /> }],
       },
       { path: '*', element: <NotFoundPage /> },
     ],

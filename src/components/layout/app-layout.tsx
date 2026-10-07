@@ -14,7 +14,10 @@ interface NavItem {
   roles?: Rol[];
 }
 
-const links: NavItem[] = [{ to: '/', label: 'Inicio' }];
+const links: NavItem[] = [
+  { to: '/', label: 'Inicio' },
+  { to: '/tipos-vehiculo', label: 'Tipos de vehículo', roles: ['ADMIN'] },
+];
 
 export function AppLayout() {
   const { usuario, cerrarSesion } = useAuth();
