@@ -13,7 +13,7 @@ export function useLogin() {
   const { iniciarSesion } = useAuth();
   return useMutation({
     mutationFn: authService.login,
-    onSuccess: ({ token, usuario }) => iniciarSesion(token, usuario),
+    onSuccess: ({ usuario }) => iniciarSesion(usuario),
   });
 }
 
@@ -21,6 +21,6 @@ export function useRegistro() {
   const { iniciarSesion } = useAuth();
   return useMutation({
     mutationFn: authService.registrar,
-    onSuccess: ({ token, usuario }) => iniciarSesion(token, usuario),
+    onSuccess: ({ usuario }) => iniciarSesion(usuario),
   });
 }

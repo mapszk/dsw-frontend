@@ -1,9 +1,10 @@
 import { expect, test, type APIRequestContext } from '@playwright/test';
 import { ADMIN, CLIENTE, ingresar } from './helpers.ts';
 
-async function token(request: APIRequestContext, credenciales: typeof ADMIN) {
+/** Login por la API: la cookie de sesion queda guardada en `request` y se envia en los pedidos siguientes */
+async function ingresarApi(request: APIRequestContext, credenciales: typeof ADMIN) {
   const res = await request.post('/api/auth/login', { data: credenciales });
-  return ((await res.json()) as { token: string }).token;
+  expect(res.status()).toBe(200);
 }
 
 /** "2026-10-09T09:00" en hora local, como lo escribe un <input type="datetime-local"> */
@@ -24,12 +25,11 @@ function diaAlAzar(hora: number) {
  * Crea una reserva pendiente para el cliente del seed. Si la cochera ya estaba ocupada ese dia
  * (409, por ejemplo por una corrida anterior que no termino), reintenta con otro dia
  */
-async function crearReserva(request: APIRequestContext, admin: string) {
+async function crearReserva(request: APIRequestContext) {
   for (let intento = 0; intento < 5; intento++) {
     const inicio = diaAlAzar(10);
     const fin = new Date(inicio.getTime() + 2 * 60 * 60_000);
     const alta = await request.post('/api/reservas', {
-      headers: { Authorization: `Bearer ${admin}` },
       data: {
         patente: 'AB123CD',
         fechaInicio: inicio.toISOString(),
@@ -49,9 +49,9 @@ async function crearReserva(request: APIRequestContext, admin: string) {
 }
 
 test('un cliente reprograma su reserva desde el detalle (CU3)', async ({ page, request }) => {
-  const admin = await token(request, ADMIN);
+  await ingresarApi(request, ADMIN);
   // La reserva se crea por la API: el alta por pantalla no es parte de este caso de uso
-  const { inicio, ...reserva } = await crearReserva(request, admin);
+  const { inicio, ...reserva } = await crearReserva(request);
 
   try {
     await page.goto(`/reservas/${reserva.id}`);
@@ -73,15 +73,11 @@ test('un cliente reprograma su reserva desde el detalle (CU3)', async ({ page, r
     await expect(page.getByText('Reserva reprogramada')).toBeVisible();
     await expect(dialogo).toBeHidden();
 
-    const actualizada = await request.get(`/api/reservas/${reserva.id}`, {
-      headers: { Authorization: `Bearer ${admin}` },
-    });
+    const actualizada = await request.get(`/api/reservas/${reserva.id}`);
     const datos = (await actualizada.json()) as { fechaInicio: string; precioTotal: number };
     expect(datos.fechaInicio).toBe(nuevoInicio.toISOString());
     expect(datos.precioTotal).toBe((reserva.precioTotal / 2) * 3);
   } finally {
-    await request.delete(`/api/reservas/${reserva.id}`, {
-      headers: { Authorization: `Bearer ${admin}` },
-    });
+    await request.delete(`/api/reservas/${reserva.id}`);
   }
 });

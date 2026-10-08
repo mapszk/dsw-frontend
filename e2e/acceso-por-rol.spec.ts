@@ -54,3 +54,24 @@ test('un cliente se registra, cierra sesion y el admin lo da de baja', async ({ 
 
   await expect(page.getByRole('cell', { name: nombre, exact: true })).toHaveCount(0);
 });
+
+test('la sesion viaja en una cookie httpOnly, sobrevive a recargar y se borra al salir', async ({
+  page,
+  context,
+}) => {
+  await page.goto('/login');
+  await ingresar(page, CLIENTE);
+
+  const sesion = (await context.cookies()).find((cookie) => cookie.name === 'sesion');
+  expect(sesion?.httpOnly).toBe(true);
+  // Ni el token ni nada de la sesion queda accesible desde JavaScript
+  expect(await page.evaluate<string>('document.cookie')).not.toContain('sesion');
+  expect(await page.evaluate<number>('localStorage.length')).toBe(0);
+
+  await page.reload();
+  await expect(page.getByRole('button', { name: 'Salir' })).toBeVisible();
+
+  await page.getByRole('button', { name: 'Salir' }).click();
+  await expect(page).toHaveURL(/\/login$/);
+  expect((await context.cookies()).find((cookie) => cookie.name === 'sesion')).toBeUndefined();
+});
