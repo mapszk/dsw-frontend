@@ -4,6 +4,9 @@ import { defineConfig, devices } from '@playwright/test';
 export default defineConfig({
   testDir: './e2e',
   fullyParallel: false,
+  // Todos los tests usan la misma base: en paralelo, las transacciones de la API sobre las mismas
+  // cocheras chocan entre si (409) y los resultados dejan de ser repetibles
+  workers: 1,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
   reporter: [['list'], ['html', { open: 'never' }]],
