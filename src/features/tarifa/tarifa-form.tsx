@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { FormField } from '@/components/form-field';
 import { Button } from '@/components/ui/button';
@@ -10,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { fromInputDate } from '@/lib/format';
+import { fromInputDate, toInputDate } from '@/lib/format';
 import type { TipoEstadia, TipoVehiculo } from '@/types/models';
 import { tarifaSchema, type TarifaPayload, type TarifaValues } from './tarifa.schema';
 
@@ -37,6 +38,10 @@ export function TarifaForm({
     handleSubmit,
     formState: { errors },
   } = useForm<TarifaValues>({ resolver: zodResolver(tarifaSchema), defaultValues });
+  // Primer dia que se puede elegir en el calendario (se calcula una vez, al abrir el formulario)
+  const [manana] = useState(() =>
+    toInputDate(new Date(Date.now() + 24 * 60 * 60_000).toISOString()),
+  );
 
   return (
     <form
@@ -120,6 +125,7 @@ export function TarifaForm({
         <Input
           id="fechaDesde"
           type="date"
+          min={manana}
           aria-invalid={!!errors.fechaDesde}
           aria-describedby={errors.fechaDesde ? 'fechaDesde-error' : undefined}
           {...register('fechaDesde')}

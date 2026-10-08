@@ -7,6 +7,9 @@ const props = {
   tiposEstadia: [{ id: 2, tipo: 'HORA', duracionMinutos: 60 }],
 };
 
+// Fechas relativas a hoy: con fechas fijas el test dejaria de pasar cuando queden en el pasado
+const enUnMes = new Date(Date.now() + 30 * 24 * 60 * 60_000).toISOString().slice(0, 10);
+
 describe('TarifaForm', () => {
   it('convierte los valores del formulario a lo que espera la API', async () => {
     const onSubmit = vi.fn();
@@ -17,7 +20,7 @@ describe('TarifaForm', () => {
           tipoVehiculoId: '1',
           tipoEstadiaId: '2',
           valor: '1500',
-          fechaDesde: '2026-12-01',
+          fechaDesde: enUnMes,
         }}
         onSubmit={onSubmit}
       />,
@@ -32,7 +35,7 @@ describe('TarifaForm', () => {
       tipoVehiculoId: 1,
       tipoEstadiaId: 2,
       valor: 1850.5,
-      fechaDesde: '2026-12-01T00:00:00.000Z',
+      fechaDesde: `${enUnMes}T00:00:00.000Z`,
     });
   });
 
@@ -49,6 +52,23 @@ describe('TarifaForm', () => {
       screen.getByText('Ingresá un importe válido, con hasta 2 decimales'),
     ).toBeInTheDocument();
     expect(screen.getByText('Elegí desde cuándo rige')).toBeInTheDocument();
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
+
+  it('no permite una fecha que no sea futura', async () => {
+    const onSubmit = vi.fn();
+    const hoy = new Date().toISOString().slice(0, 10);
+    render(
+      <TarifaForm
+        {...props}
+        defaultValues={{ tipoVehiculoId: '1', tipoEstadiaId: '2', valor: '1500', fechaDesde: hoy }}
+        onSubmit={onSubmit}
+      />,
+    );
+
+    await userEvent.click(screen.getByRole('button', { name: 'Guardar' }));
+
+    expect(await screen.findByText('Elegí una fecha posterior a hoy')).toBeInTheDocument();
     expect(onSubmit).not.toHaveBeenCalled();
   });
 });
