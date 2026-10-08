@@ -2,7 +2,7 @@ import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { ConfirmDialog } from '@/components/confirm-dialog';
 import { PageHeader } from '@/components/page-header';
-import { QueryState } from '@/components/query-state';
+import { EmptyMessage, ErrorMessage, ListSkeleton } from '@/components/query-states';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -69,13 +69,13 @@ export function TarifasPage() {
         }
       />
 
-      <QueryState
-        isPending={tarifas.isPending}
-        error={tarifas.error}
-        isEmpty={tarifas.data?.length === 0}
-        emptyMessage="Todavía no hay tarifas."
-        onRetry={() => tarifas.refetch()}
-      >
+      {tarifas.isPending ? (
+        <ListSkeleton />
+      ) : tarifas.isError ? (
+        <ErrorMessage message={tarifas.error.message} onRetry={() => tarifas.refetch()} />
+      ) : tarifas.data.length === 0 ? (
+        <EmptyMessage>Todavía no hay tarifas.</EmptyMessage>
+      ) : (
         <div className="overflow-x-auto rounded-lg border">
           <Table>
             <TableHeader>
@@ -89,7 +89,7 @@ export function TarifasPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {tarifas.data?.map((tarifa) => {
+              {tarifas.data.map((tarifa) => {
                 const estado = estadoPorId.get(tarifa.id) ?? 'anterior';
                 const nombre = `${tarifa.tipoVehiculo.tipo} por ${tarifa.tipoEstadia.tipo}`;
                 return (
@@ -131,7 +131,7 @@ export function TarifasPage() {
             </TableBody>
           </Table>
         </div>
-      </QueryState>
+      )}
 
       <Dialog open={editando !== null} onOpenChange={(open) => !open && setEditando(null)}>
         <DialogContent>
@@ -175,7 +175,6 @@ export function TarifasPage() {
             ? `${aEliminar.tipoVehiculo.tipo} por ${aEliminar.tipoEstadia.tipo}: ${formatMoneda(aEliminar.valor)} desde el ${formatFechaUtc(aEliminar.fechaDesde)}.`
             : ''
         }
-        isPending={eliminar.isPending}
         onConfirm={() =>
           aEliminar && eliminar.mutate(aEliminar.id, { onSuccess: () => setAEliminar(null) })
         }

@@ -16,8 +16,10 @@ interface NavItem {
 
 const links: NavItem[] = [
   { to: '/', label: 'Inicio' },
+  { to: '/reservas', label: 'Reservas' },
   { to: '/usuarios', label: 'Usuarios', roles: ['ADMIN'] },
   { to: '/tipos-vehiculo', label: 'Tipos de vehículo', roles: ['ADMIN'] },
+  { to: '/tipos-estadia', label: 'Tipos de estadía', roles: ['ADMIN'] },
   { to: '/tarifas', label: 'Tarifas', roles: ['ADMIN'] },
 ];
 
@@ -34,12 +36,12 @@ export function AppLayout() {
           <span className="font-heading text-lg font-semibold">Estacionamiento</span>
           {usuario && (
             <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
-              <nav className="flex gap-4 text-sm">
+              <nav className="flex flex-wrap gap-x-4 gap-y-1 text-sm">
                 {visibles.map((link) => (
                   <NavLink
                     key={link.to}
                     to={link.to}
-                    end
+                    end={link.to === '/'}
                     className={({ isActive }) =>
                       cn(
                         'text-muted-foreground hover:text-foreground',

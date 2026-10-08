@@ -1,6 +1,5 @@
-// Modelos del dominio segun el DER (espejo de prisma/schema.prisma en dsw-api).
-// Los montos (Decimal en la API) llegan como string para no perder precision.
-// Las fechas llegan como string ISO 8601.
+// Modelos del dominio segun el DER (espejo de los DTOs de respuesta de dsw-api).
+// Los montos llegan como number y las fechas como string ISO 8601.
 
 export const ROLES = ['ADMIN', 'CLIENTE'] as const;
 export type Rol = (typeof ROLES)[number];
@@ -29,7 +28,6 @@ export interface Usuario {
   rol: Rol;
 }
 
-// TipoVehiculo, TipoEstadia y Tarifa siguen los DTOs de la API: sin timestamps y montos como number
 export interface TipoVehiculo {
   id: number;
   tipo: string;
@@ -63,7 +61,6 @@ export interface Cochera extends Timestamps {
   playa?: Playa;
 }
 
-// Igual al ReservaDto de la API (dsw-api: reserva.dto.ts)
 export interface Reserva {
   id: number;
   patente: string;
@@ -71,22 +68,16 @@ export interface Reserva {
   fechaFin: string;
   precioTotal: number;
   estado: EstadoReserva;
-  usuario: Usuario;
-  cochera: {
-    id: number;
-    techada: boolean;
-    estado: EstadoCochera;
-    playa: { id: number; sector: string };
-  };
-  tipoVehiculo: TipoVehiculo;
+  usuario: Pick<Usuario, 'id' | 'nombre' | 'dni' | 'email' | 'telefono'>;
+  cochera: Pick<Cochera, 'id' | 'techada' | 'estado'> & { playa: Pick<Playa, 'id' | 'sector'> };
+  tipoVehiculo: Pick<TipoVehiculo, 'id' | 'tipo'>;
   tipoEstadia: TipoEstadia;
-  pago: { id: number; fecha: string; metodo: MetodoPago; monto: number } | null;
+  pago: Pago | null;
 }
 
-export interface Pago extends Timestamps {
+export interface Pago {
   id: number;
   fecha: string;
   metodo: MetodoPago;
-  monto: string;
-  reservaId: number;
+  monto: number;
 }

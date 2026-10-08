@@ -2,7 +2,7 @@ import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { ConfirmDialog } from '@/components/confirm-dialog';
 import { PageHeader } from '@/components/page-header';
-import { QueryState } from '@/components/query-state';
+import { EmptyMessage, ErrorMessage, ListSkeleton } from '@/components/query-states';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import {
@@ -45,13 +45,13 @@ export function TiposVehiculoPage() {
         }
       />
 
-      <QueryState
-        isPending={tipos.isPending}
-        error={tipos.error}
-        isEmpty={tipos.data?.length === 0}
-        emptyMessage="Todavía no hay tipos de vehículo."
-        onRetry={() => tipos.refetch()}
-      >
+      {tipos.isPending ? (
+        <ListSkeleton />
+      ) : tipos.isError ? (
+        <ErrorMessage message={tipos.error.message} onRetry={() => tipos.refetch()} />
+      ) : tipos.data.length === 0 ? (
+        <EmptyMessage>Todavía no hay tipos de vehículo.</EmptyMessage>
+      ) : (
         <div className="overflow-x-auto rounded-lg border">
           <Table>
             <TableHeader>
@@ -61,7 +61,7 @@ export function TiposVehiculoPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {tipos.data?.map((tipo) => (
+              {tipos.data.map((tipo) => (
                 <TableRow key={tipo.id}>
                   <TableCell className="font-medium">{tipo.tipo}</TableCell>
                   <TableCell className="text-right">
@@ -87,7 +87,7 @@ export function TiposVehiculoPage() {
             </TableBody>
           </Table>
         </div>
-      </QueryState>
+      )}
 
       <Dialog open={editando !== null} onOpenChange={(open) => !open && setEditando(null)}>
         <DialogContent>
@@ -115,7 +115,6 @@ export function TiposVehiculoPage() {
         onOpenChange={(open) => !open && setAEliminar(null)}
         title={`¿Eliminar ${aEliminar?.tipo}?`}
         description="No se puede eliminar si tiene tarifas o reservas asociadas."
-        isPending={eliminar.isPending}
         onConfirm={() =>
           aEliminar && eliminar.mutate(aEliminar.id, { onSuccess: () => setAEliminar(null) })
         }

@@ -2,7 +2,7 @@ import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { ConfirmDialog } from '@/components/confirm-dialog';
 import { PageHeader } from '@/components/page-header';
-import { QueryState } from '@/components/query-state';
+import { EmptyMessage, ErrorMessage, ListSkeleton } from '@/components/query-states';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -47,13 +47,13 @@ export function UsuariosPage() {
         }
       />
 
-      <QueryState
-        isPending={usuarios.isPending}
-        error={usuarios.error}
-        isEmpty={usuarios.data?.length === 0}
-        emptyMessage="Todavía no hay usuarios."
-        onRetry={() => usuarios.refetch()}
-      >
+      {usuarios.isPending ? (
+        <ListSkeleton />
+      ) : usuarios.isError ? (
+        <ErrorMessage message={usuarios.error.message} onRetry={() => usuarios.refetch()} />
+      ) : usuarios.data.length === 0 ? (
+        <EmptyMessage>Todavía no hay usuarios.</EmptyMessage>
+      ) : (
         <div className="overflow-x-auto rounded-lg border">
           <Table>
             <TableHeader>
@@ -67,7 +67,7 @@ export function UsuariosPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {usuarios.data?.map((usuario) => (
+              {usuarios.data.map((usuario) => (
                 <TableRow key={usuario.id}>
                   <TableCell className="font-medium">{usuario.nombre}</TableCell>
                   <TableCell>{usuario.dni}</TableCell>
@@ -104,7 +104,7 @@ export function UsuariosPage() {
             </TableBody>
           </Table>
         </div>
-      </QueryState>
+      )}
 
       <Dialog open={editando !== null} onOpenChange={(open) => !open && setEditando(null)}>
         <DialogContent>
@@ -142,7 +142,6 @@ export function UsuariosPage() {
         onOpenChange={(open) => !open && setAEliminar(null)}
         title={`¿Eliminar a ${aEliminar?.nombre}?`}
         description="No se puede eliminar un usuario que tiene reservas."
-        isPending={eliminar.isPending}
         onConfirm={() =>
           aEliminar && eliminar.mutate(aEliminar.id, { onSuccess: () => setAEliminar(null) })
         }

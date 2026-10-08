@@ -4,8 +4,12 @@ import { GuestOnly, RequireAuth } from '@/features/auth/route-guards';
 import { HomePage } from '@/pages/home-page';
 import { LoginPage } from '@/pages/login-page';
 import { NotFoundPage } from '@/pages/not-found-page';
+import { NuevaReservaPage } from '@/pages/nueva-reserva-page';
 import { RegistroPage } from '@/pages/registro-page';
+import { ReservaDetallePage } from '@/pages/reserva-detalle-page';
+import { ReservasPage } from '@/pages/reservas-page';
 import { TarifasPage } from '@/pages/tarifas-page';
+import { TiposEstadiaPage } from '@/pages/tipos-estadia-page';
 import { TiposVehiculoPage } from '@/pages/tipos-vehiculo-page';
 import { UsuariosPage } from '@/pages/usuarios-page';
 
@@ -23,13 +27,21 @@ export const router = createBrowserRouter([
       {
         // Cualquier usuario logueado. Las secciones de un solo rol van en <RequireAuth roles={[...]} />
         element: <RequireAuth />,
-        children: [{ path: '/', element: <HomePage /> }],
+        // La API filtra las reservas: un CLIENTE solo ve las suyas
+        children: [
+          { path: '/', element: <HomePage /> },
+          { path: '/reservas', element: <ReservasPage /> },
+          { path: '/reservas/:id', element: <ReservaDetallePage /> },
+        ],
       },
       {
         element: <RequireAuth roles={['ADMIN']} />,
         children: [
+          // El alta elige el cliente de la lista de usuarios, que solo puede ver un ADMIN
+          { path: '/reservas/nueva', element: <NuevaReservaPage /> },
           { path: '/usuarios', element: <UsuariosPage /> },
           { path: '/tipos-vehiculo', element: <TiposVehiculoPage /> },
+          { path: '/tipos-estadia', element: <TiposEstadiaPage /> },
           { path: '/tarifas', element: <TarifasPage /> },
         ],
       },
