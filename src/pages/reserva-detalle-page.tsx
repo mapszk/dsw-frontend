@@ -1,4 +1,4 @@
-import { ArrowLeftIcon, CalendarClockIcon, PencilIcon, Trash2Icon } from 'lucide-react';
+import { ArrowLeftIcon, BanIcon, CalendarClockIcon, PencilIcon, Trash2Icon } from 'lucide-react';
 import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 import { ConfirmDialog } from '@/components/confirm-dialog';
@@ -12,13 +12,15 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { EditarReservaForm } from '@/features/reserva/editar-reserva-form';
-import { puedeEditarse, puedeEliminarse } from '@/features/reserva/estado-reserva';
+import { useAuth } from '@/features/auth/use-auth';
+import { puedeCancelarse, puedeEditarse, puedeEliminarse } from '@/features/reserva/estado-reserva';
 import { EstadoReservaBadge } from '@/features/reserva/estado-reserva-badge';
 import { ReprogramarReservaDialog } from '@/features/reserva/reprogramar-reserva-dialog';
 import { ReservaDetalle } from '@/features/reserva/reserva-detalle';
 import type { ActualizarReservaInput } from '@/features/reserva/reserva.service';
 import {
   useActualizarReserva,
+  useCancelarReserva,
   useEliminarReserva,
   useReserva,
 } from '@/features/reserva/use-reservas';
@@ -29,9 +31,13 @@ export function ReservaDetallePage() {
   const reserva = useReserva(id);
   const actualizar = useActualizarReserva();
   const eliminar = useEliminarReserva();
+  const cancelar = useCancelarReserva();
+  const { usuario } = useAuth();
+  const esAdmin = usuario?.rol === 'ADMIN';
   const [editando, setEditando] = useState(false);
   const [confirmando, setConfirmando] = useState(false);
   const [reprogramando, setReprogramando] = useState(false);
+  const [cancelando, setCancelando] = useState(false);
 
   const guardar = async (data: ActualizarReservaInput) => {
     await actualizar.mutateAsync({ id, data });
@@ -74,7 +80,13 @@ export function ReservaDetallePage() {
                   <CalendarClockIcon /> Reprogramar
                 </Button>
               )}
-              {puedeEliminarse(reserva.data.estado) && (
+              {usuario && puedeCancelarse(reserva.data.estado, usuario.rol) && (
+                <Button variant="outline" onClick={() => setCancelando(true)}>
+                  <BanIcon /> Cancelar reserva
+                </Button>
+              )}
+              {/* Un CLIENTE cancela; eliminar es solo para ADMIN, igual que en la API */}
+              {esAdmin && puedeEliminarse(reserva.data.estado) && (
                 <Button variant="destructive" onClick={() => setConfirmando(true)}>
                   <Trash2Icon /> Eliminar
                 </Button>
@@ -104,6 +116,16 @@ export function ReservaDetallePage() {
             title="¿Eliminar la reserva?"
             description={`Se eliminará la reserva de ${reserva.data.patente}. Esta acción no se puede deshacer.`}
             onConfirm={confirmarEliminar}
+          />
+
+          <ConfirmDialog
+            open={cancelando}
+            onOpenChange={setCancelando}
+            title="¿Cancelar la reserva?"
+            description={`La reserva de ${reserva.data.patente} pasará a Cancelada y quedará en el historial. La cochera vuelve a estar disponible en ese horario.`}
+            confirmLabel="Cancelar reserva"
+            cancelLabel="Volver"
+            onConfirm={() => cancelar.mutate(id)}
           />
 
           <ReprogramarReservaDialog

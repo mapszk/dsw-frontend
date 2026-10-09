@@ -42,6 +42,7 @@ export const reservaService = {
   update: (id: number, data: ActualizarReservaInput) =>
     apiClient.patch<Reserva>(`/reservas/${id}`, data),
   delete: (id: number) => apiClient.delete(`/reservas/${id}`),
+  cancelar: (id: number) => apiClient.post<Reserva>(`/reservas/${id}/cancelar`),
   reprogramar: (id: number, data: ReprogramarReservaPayload) =>
     apiClient.post<Reserva>(`/reservas/${id}/reprogramar`, data),
 };

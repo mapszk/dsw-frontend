@@ -1,51 +1,10 @@
-import { expect, test, type APIRequestContext } from '@playwright/test';
-import { ADMIN, CLIENTE, ingresar } from './helpers.ts';
-
-/** Login por la API: la cookie de sesion queda guardada en `request` y se envia en los pedidos siguientes */
-async function ingresarApi(request: APIRequestContext, credenciales: typeof ADMIN) {
-  const res = await request.post('/api/auth/login', { data: credenciales });
-  expect(res.status()).toBe(200);
-}
+import { expect, test } from '@playwright/test';
+import { ADMIN, CLIENTE, crearReserva, ingresar, ingresarApi } from './helpers.ts';
 
 /** "2026-10-09T09:00" en hora local, como lo escribe un <input type="datetime-local"> */
 function inputLocal(fecha: Date) {
   const pad = (n: number) => String(n).padStart(2, '0');
   return `${fecha.getFullYear()}-${pad(fecha.getMonth() + 1)}-${pad(fecha.getDate())}T${pad(fecha.getHours())}:${pad(fecha.getMinutes())}`;
-}
-
-/** Dia al azar dentro de los proximos 3 años, para no chocar con otras reservas de la cochera */
-function diaAlAzar(hora: number) {
-  const fecha = new Date();
-  fecha.setDate(fecha.getDate() + 30 + Math.floor(Math.random() * 1000));
-  fecha.setHours(hora, 0, 0, 0);
-  return fecha;
-}
-
-/**
- * Crea una reserva pendiente para el cliente del seed. Si la cochera ya estaba ocupada ese dia
- * (409, por ejemplo por una corrida anterior que no termino), reintenta con otro dia
- */
-async function crearReserva(request: APIRequestContext) {
-  for (let intento = 0; intento < 5; intento++) {
-    const inicio = diaAlAzar(10);
-    const fin = new Date(inicio.getTime() + 2 * 60 * 60_000);
-    const alta = await request.post('/api/reservas', {
-      data: {
-        patente: 'AB123CD',
-        fechaInicio: inicio.toISOString(),
-        fechaFin: fin.toISOString(),
-        usuarioId: 2,
-        cocheraId: 1,
-        tipoVehiculoId: 1,
-        tipoEstadiaId: 1,
-      },
-    });
-    if (alta.status() === 409) continue;
-    expect(alta.status(), await alta.text()).toBe(201);
-    const reserva = (await alta.json()) as { id: number; precioTotal: number };
-    return { ...reserva, inicio };
-  }
-  throw new Error('No se pudo crear la reserva de prueba');
 }
 
 test('un cliente reprograma su reserva desde el detalle (CU3)', async ({ page, request }) => {

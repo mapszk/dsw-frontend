@@ -14,6 +14,8 @@ interface ConfirmDialogProps {
   title: string;
   description: string;
   confirmLabel?: string;
+  /** Texto del boton que cierra sin confirmar */
+  cancelLabel?: string;
   onConfirm: () => void;
   onOpenChange: (open: boolean) => void;
 }
@@ -24,6 +26,7 @@ export function ConfirmDialog({
   title,
   description,
   confirmLabel = 'Eliminar',
+  cancelLabel = 'Cancelar',
   onConfirm,
   onOpenChange,
 }: ConfirmDialogProps) {
@@ -35,7 +38,7 @@ export function ConfirmDialog({
           <AlertDialogDescription>{description}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancelar</AlertDialogCancel>
+          <AlertDialogCancel>{cancelLabel}</AlertDialogCancel>
           <AlertDialogAction variant="destructive" onClick={onConfirm}>
             {confirmLabel}
           </AlertDialogAction>
