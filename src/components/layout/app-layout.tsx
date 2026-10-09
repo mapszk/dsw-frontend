@@ -3,7 +3,6 @@ import {
   CalendarClock,
   Car,
   Clock,
-  House,
   LogOut,
   Users,
   type LucideIcon,
@@ -24,7 +23,6 @@ interface NavItem {
 }
 
 const links: NavItem[] = [
-  { to: '/', label: 'Inicio', icon: House },
   { to: '/reservas', label: 'Reservas', icon: CalendarClock },
   { to: '/usuarios', label: 'Usuarios', icon: Users, roles: ['ADMIN'] },
   { to: '/tipos-vehiculo', label: 'Tipos de vehículo', icon: Car, roles: ['ADMIN'] },
@@ -78,7 +76,6 @@ export function AppLayout() {
                 <li key={link.to} className="shrink-0">
                   <NavLink
                     to={link.to}
-                    end={link.to === '/'}
                     className={({ isActive }) =>
                       cn(
                         'text-muted-foreground hover:bg-background/70 hover:text-foreground flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium whitespace-nowrap transition-colors',

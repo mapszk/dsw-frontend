@@ -34,7 +34,7 @@ function renderRuta(ruta: string | { pathname: string; state: unknown }) {
       },
       {
         element: <RequireAuth />,
-        children: [{ path: '/', element: <p>Inicio</p> }],
+        children: [{ path: '/reservas', element: <p>Reservas</p> }],
       },
       {
         element: <RequireAuth roles={['ADMIN']} />,
@@ -56,16 +56,16 @@ describe('RequireAuth y GuestOnly', () => {
 
   it('espera mientras se valida la sesion guardada', () => {
     sesion(null, true);
-    renderRuta('/');
+    renderRuta('/reservas');
 
     expect(screen.getByRole('status')).toHaveTextContent('Cargando sesión...');
   });
 
   it('deja pasar a un usuario logueado', () => {
     sesion(cliente);
-    renderRuta('/');
+    renderRuta('/reservas');
 
-    expect(screen.getByText('Inicio')).toBeInTheDocument();
+    expect(screen.getByText('Reservas')).toBeInTheDocument();
   });
 
   it('muestra sin permisos si el rol no alcanza', () => {
@@ -87,7 +87,7 @@ describe('RequireAuth y GuestOnly', () => {
     sesion(cliente);
     renderRuta('/login');
 
-    expect(screen.getByText('Inicio')).toBeInTheDocument();
+    expect(screen.getByText('Reservas')).toBeInTheDocument();
   });
 
   it('al iniciar sesion vuelve a la ruta protegida que se habia pedido', () => {

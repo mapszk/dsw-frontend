@@ -7,7 +7,7 @@ export function NotFoundPage() {
       <h1 className="font-heading text-2xl font-semibold">Pagina no encontrada</h1>
       <p className="text-muted-foreground">La direccion que buscas no existe.</p>
       <Button asChild>
-        <Link to="/">Volver al inicio</Link>
+        <Link to="/reservas">Volver a reservas</Link>
       </Button>
     </section>
   );

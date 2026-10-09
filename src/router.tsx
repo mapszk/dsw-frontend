@@ -1,7 +1,6 @@
-import { createBrowserRouter } from 'react-router';
+import { createBrowserRouter, Navigate } from 'react-router';
 import { AppLayout } from '@/components/layout/app-layout';
 import { GuestOnly, RequireAuth } from '@/features/auth/route-guards';
-import { HomePage } from '@/pages/home-page';
 import { LoginPage } from '@/pages/login-page';
 import { NotFoundPage } from '@/pages/not-found-page';
 import { NuevaReservaPage } from '@/pages/nueva-reserva-page';
@@ -29,7 +28,7 @@ export const router = createBrowserRouter([
         element: <RequireAuth />,
         // La API filtra las reservas: un CLIENTE solo ve las suyas
         children: [
-          { path: '/', element: <HomePage /> },
+          { path: '/', element: <Navigate to="/reservas" replace /> },
           { path: '/reservas', element: <ReservasPage /> },
           // Un ADMIN elige el cliente; un CLIENTE reserva a su nombre
           { path: '/reservas/nueva', element: <NuevaReservaPage /> },

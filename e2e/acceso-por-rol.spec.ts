@@ -39,7 +39,7 @@ test('un cliente se registra, cierra sesion y el admin lo da de baja', async ({ 
   await page.getByLabel('Repetir contraseña').fill('secreto123');
   await page.getByRole('button', { name: 'Crear cuenta' }).click();
 
-  await expect(page).toHaveURL(/\/$/);
+  await expect(page).toHaveURL(/\/reservas$/);
   await expect(page.getByRole('banner').getByText(nombre)).toBeVisible();
 
   await page.getByRole('button', { name: 'Salir' }).click();

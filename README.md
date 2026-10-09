@@ -77,7 +77,7 @@ El navegador llama a `/api/...` en el mismo origen (`localhost:5173`) y Vite ree
 
 ### Problemas frecuentes
 
-- **"API sin conexión":** verificá que la API esté levantada (`curl http://localhost:3000/api/health`).
+- **Errores de conexión:** verificá que la API esté levantada (`curl http://localhost:3000/api/health`).
 - **Puerto 5173 ocupado:** Vite usa el siguiente puerto libre; revisá la URL que muestra la terminal.
 - **La API corre en otro puerto o máquina:** cambiá `API_PROXY_TARGET` en `.env` y reiniciá `npm run dev`.
 
