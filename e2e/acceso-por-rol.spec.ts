@@ -75,3 +75,19 @@ test('la sesion viaja en una cookie httpOnly, sobrevive a recargar y se borra al
   await expect(page).toHaveURL(/\/login$/);
   expect((await context.cookies()).find((cookie) => cookie.name === 'sesion')).toBeUndefined();
 });
+
+test('un cliente entra al alta de reservas y no elige cliente: reserva a su nombre', async ({
+  page,
+}) => {
+  await page.goto('/login');
+  await ingresar(page, CLIENTE);
+
+  await page.getByRole('link', { name: 'Reservas' }).click();
+  await page.getByRole('link', { name: 'Nueva reserva' }).click();
+
+  await expect(page).toHaveURL(/\/reservas\/nueva$/);
+  await expect(page.getByText('La reserva queda a tu nombre.')).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Sin permisos' })).toHaveCount(0);
+  await expect(page.getByRole('combobox', { name: 'Cliente' })).toHaveCount(0);
+  await expect(page.getByRole('combobox', { name: 'Tipo de vehículo' })).toBeVisible();
+});

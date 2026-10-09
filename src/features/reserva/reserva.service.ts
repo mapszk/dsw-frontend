@@ -11,7 +11,8 @@ export interface CrearReservaInput {
   patente: string;
   fechaInicio: string;
   fechaFin: string;
-  usuarioId: number;
+  /** Solo lo indica un ADMIN: si reserva un CLIENTE, la API usa el usuario logueado */
+  usuarioId?: number;
   cocheraId: number;
   tipoVehiculoId: number;
   tipoEstadiaId: number;

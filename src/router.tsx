@@ -31,14 +31,14 @@ export const router = createBrowserRouter([
         children: [
           { path: '/', element: <HomePage /> },
           { path: '/reservas', element: <ReservasPage /> },
+          // Un ADMIN elige el cliente; un CLIENTE reserva a su nombre
+          { path: '/reservas/nueva', element: <NuevaReservaPage /> },
           { path: '/reservas/:id', element: <ReservaDetallePage /> },
         ],
       },
       {
         element: <RequireAuth roles={['ADMIN']} />,
         children: [
-          // El alta elige el cliente de la lista de usuarios, que solo puede ver un ADMIN
-          { path: '/reservas/nueva', element: <NuevaReservaPage /> },
           { path: '/usuarios', element: <UsuariosPage /> },
           { path: '/tipos-vehiculo', element: <TiposVehiculoPage /> },
           { path: '/tipos-estadia', element: <TiposEstadiaPage /> },

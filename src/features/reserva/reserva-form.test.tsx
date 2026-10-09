@@ -70,4 +70,37 @@ describe('ReservaForm', () => {
       await screen.findByText('La cochera ya esta reservada en ese horario'),
     ).toBeInTheDocument();
   });
+
+  it('un cliente no elige el cliente: la reserva se envia sin usuarioId', async () => {
+    const user = userEvent.setup();
+    const onSubmit = vi.fn().mockResolvedValue({});
+    render(
+      <ReservaForm
+        opciones={opciones}
+        elegirCliente={false}
+        onSubmit={onSubmit}
+        onCancel={vi.fn()}
+      />,
+    );
+
+    expect(screen.queryByRole('combobox', { name: 'Cliente' })).not.toBeInTheDocument();
+
+    await user.type(screen.getByLabelText('Patente'), 'ab 123-cd');
+    await user.type(screen.getByLabelText('Inicio'), '2099-01-10T10:00');
+    await user.type(screen.getByLabelText('Fin'), '2099-01-10T12:00');
+    await elegir(user, 'Cochera', 'Cochera 1');
+    await elegir(user, 'Tipo de vehículo', 'AUTO');
+    await elegir(user, 'Tipo de estadía', 'HORA');
+    await user.click(screen.getByRole('button', { name: 'Crear reserva' }));
+
+    // Sin usuarioId: la API deja la reserva a nombre del usuario logueado
+    expect(onSubmit).toHaveBeenCalledWith({
+      patente: 'AB123CD',
+      fechaInicio: new Date('2099-01-10T10:00').toISOString(),
+      fechaFin: new Date('2099-01-10T12:00').toISOString(),
+      cocheraId: 1,
+      tipoVehiculoId: 1,
+      tipoEstadiaId: 1,
+    });
+  });
 });

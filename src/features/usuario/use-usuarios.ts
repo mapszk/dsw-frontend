@@ -7,9 +7,11 @@ import { usuarioService } from './usuario.service';
 const key = ['usuarios'];
 
 /** La API devuelve todos los usuarios: el filtro por rol (ej: clientes para una reserva) se aplica aca */
-export function useUsuarios(filtros: { rol?: Rol } = {}) {
+export function useUsuarios(filtros: { rol?: Rol } = {}, { enabled = true } = {}) {
   return useQuery({
     queryKey: key,
+    // Solo un ADMIN puede listar usuarios: para un CLIENTE la pantalla no la pide
+    enabled,
     queryFn: usuarioService.list,
     select: (usuarios) =>
       filtros.rol ? usuarios.filter((usuario) => usuario.rol === filtros.rol) : usuarios,

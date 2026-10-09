@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useAuth } from '@/features/auth/use-auth';
 import { useCocheras } from '@/features/cochera/use-cocheras';
 import type { OpcionesQuery } from '@/features/reserva/opcion-select';
 import { ReservaForm } from '@/features/reserva/reserva-form';
@@ -28,7 +29,9 @@ function toOpciones<T>(
 export function NuevaReservaPage() {
   const navigate = useNavigate();
   const crear = useCrearReserva();
-  const usuarios = useUsuarios({ rol: 'CLIENTE' });
+  const { usuario } = useAuth();
+  const esAdmin = usuario?.rol === 'ADMIN';
+  const usuarios = useUsuarios({ rol: 'CLIENTE' }, { enabled: esAdmin });
   const cocheras = useCocheras();
   const tiposVehiculo = useTiposVehiculo();
   const tiposEstadia = useTiposEstadia();
@@ -58,11 +61,13 @@ export function NuevaReservaPage() {
           <CardTitle>Nueva reserva</CardTitle>
           <CardDescription>
             Se valida que la cochera esté libre en ese horario y se calcula el precio.
+            {!esAdmin && ' La reserva queda a tu nombre.'}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <ReservaForm
             opciones={opciones}
+            elegirCliente={esAdmin}
             onSubmit={guardar}
             onCancel={() => navigate('/reservas')}
           />
