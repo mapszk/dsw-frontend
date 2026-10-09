@@ -55,3 +55,15 @@ export function useEliminarReserva() {
     onError: (error) => toast.error(error.message),
   });
 }
+
+export function useCancelarReserva() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: reservaService.cancelar,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['reservas'] });
+      toast.success('Reserva cancelada');
+    },
+    onError: (error) => toast.error(error.message),
+  });
+}

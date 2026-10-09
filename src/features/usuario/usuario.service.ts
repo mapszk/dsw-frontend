@@ -1,7 +1,10 @@
 import { apiClient } from '@/lib/api-client';
-import type { Rol, Usuario } from '@/types/models';
+import type { Usuario } from '@/types/models';
+import type { UsuarioPayload } from './usuario.schema';
 
 export const usuarioService = {
-  list: (filtros: { rol?: Rol } = {}) =>
-    apiClient.get<Usuario[]>(`/usuarios${filtros.rol ? `?rol=${filtros.rol}` : ''}`),
+  list: () => apiClient.get<Usuario[]>('/usuarios'),
+  create: (data: UsuarioPayload) => apiClient.post<Usuario>('/usuarios', data),
+  update: (id: number, data: UsuarioPayload) => apiClient.patch<Usuario>(`/usuarios/${id}`, data),
+  remove: (id: number) => apiClient.delete(`/usuarios/${id}`),
 };

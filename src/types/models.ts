@@ -18,7 +18,8 @@ interface Timestamps {
   updatedAt: string;
 }
 
-export interface Usuario extends Timestamps {
+// La API no devuelve timestamps ni password de los usuarios
+export interface Usuario {
   id: number;
   nombre: string;
   telefono: string | null;
@@ -27,7 +28,7 @@ export interface Usuario extends Timestamps {
   rol: Rol;
 }
 
-export interface TipoVehiculo extends Timestamps {
+export interface TipoVehiculo {
   id: number;
   tipo: string;
 }
@@ -38,14 +39,12 @@ export interface TipoEstadia {
   duracionMinutos: number;
 }
 
-export interface Tarifa extends Timestamps {
+export interface Tarifa {
   id: number;
-  valor: string;
+  valor: number;
   fechaDesde: string;
-  tipoVehiculoId: number;
-  tipoEstadiaId: number;
-  tipoVehiculo?: TipoVehiculo;
-  tipoEstadia?: TipoEstadia;
+  tipoVehiculo: TipoVehiculo;
+  tipoEstadia: TipoEstadia;
 }
 
 export interface Playa extends Timestamps {

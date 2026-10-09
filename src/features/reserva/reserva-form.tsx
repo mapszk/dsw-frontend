@@ -21,6 +21,8 @@ export interface ReservaFormOpciones {
 
 interface ReservaFormProps {
   opciones: ReservaFormOpciones;
+  /** true para un ADMIN, que elige el cliente; un CLIENTE reserva a su nombre */
+  elegirCliente?: boolean;
   onSubmit: (data: CrearReservaInput) => Promise<unknown>;
   onCancel: () => void;
 }
@@ -53,7 +55,12 @@ function toDatetimeLocal(fecha: Date) {
   return local.toISOString().slice(0, 16);
 }
 
-export function ReservaForm({ opciones, onSubmit, onCancel }: ReservaFormProps) {
+export function ReservaForm({
+  opciones,
+  elegirCliente = true,
+  onSubmit,
+  onCancel,
+}: ReservaFormProps) {
   const {
     register,
     control,
@@ -61,7 +68,7 @@ export function ReservaForm({ opciones, onSubmit, onCancel }: ReservaFormProps) 
     setError,
     formState: { errors, isSubmitting },
   } = useForm<CrearReservaFormValues>({
-    resolver: zodResolver(crearReservaSchema),
+    resolver: zodResolver(crearReservaSchema({ elegirCliente })),
     defaultValues: {
       patente: '',
       fechaInicio: '',
@@ -79,7 +86,7 @@ export function ReservaForm({ opciones, onSubmit, onCancel }: ReservaFormProps) 
         patente: normalizarPatente(values.patente),
         fechaInicio: new Date(values.fechaInicio).toISOString(),
         fechaFin: new Date(values.fechaFin).toISOString(),
-        usuarioId: Number(values.usuarioId),
+        ...(elegirCliente && { usuarioId: Number(values.usuarioId) }),
         cocheraId: Number(values.cocheraId),
         tipoVehiculoId: Number(values.tipoVehiculoId),
         tipoEstadiaId: Number(values.tipoEstadiaId),
@@ -134,26 +141,28 @@ export function ReservaForm({ opciones, onSubmit, onCancel }: ReservaFormProps) 
         </div>
 
         <div className="grid gap-4 md:grid-cols-2">
-          {selects.map((select) => (
-            <Field key={select.name} data-invalid={!!errors[select.name]}>
-              <FieldLabel htmlFor={select.name}>{select.label}</FieldLabel>
-              <Controller
-                control={control}
-                name={select.name}
-                render={({ field }) => (
-                  <OpcionSelect
-                    id={select.name}
-                    value={field.value}
-                    onChange={field.onChange}
-                    placeholder={select.placeholder}
-                    opciones={opciones[select.opcion]}
-                    invalid={!!errors[select.name]}
-                  />
-                )}
-              />
-              <FieldError errors={[errors[select.name]]} />
-            </Field>
-          ))}
+          {selects
+            .filter((select) => elegirCliente || select.name !== 'usuarioId')
+            .map((select) => (
+              <Field key={select.name} data-invalid={!!errors[select.name]}>
+                <FieldLabel htmlFor={select.name}>{select.label}</FieldLabel>
+                <Controller
+                  control={control}
+                  name={select.name}
+                  render={({ field }) => (
+                    <OpcionSelect
+                      id={select.name}
+                      value={field.value}
+                      onChange={field.onChange}
+                      placeholder={select.placeholder}
+                      opciones={opciones[select.opcion]}
+                      invalid={!!errors[select.name]}
+                    />
+                  )}
+                />
+                <FieldError errors={[errors[select.name]]} />
+              </Field>
+            ))}
         </div>
 
         <FieldDescription>

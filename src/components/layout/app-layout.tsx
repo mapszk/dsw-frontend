@@ -1,33 +1,68 @@
+import { LogOut } from 'lucide-react';
 import { NavLink, Outlet } from 'react-router';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Toaster } from '@/components/ui/sonner';
+import { useAuth } from '@/features/auth/use-auth';
 import { cn } from '@/lib/utils';
+import type { Rol } from '@/types/models';
 
-const links = [
+interface NavItem {
+  to: string;
+  label: string;
+  /** Sin indicar, lo ve cualquier usuario logueado */
+  roles?: Rol[];
+}
+
+const links: NavItem[] = [
   { to: '/', label: 'Inicio' },
   { to: '/reservas', label: 'Reservas' },
-  { to: '/tipos-estadia', label: 'Tipos de estadía' },
+  { to: '/usuarios', label: 'Usuarios', roles: ['ADMIN'] },
+  { to: '/tipos-vehiculo', label: 'Tipos de vehículo', roles: ['ADMIN'] },
+  { to: '/tipos-estadia', label: 'Tipos de estadía', roles: ['ADMIN'] },
+  { to: '/tarifas', label: 'Tarifas', roles: ['ADMIN'] },
 ];
 
 export function AppLayout() {
+  const { usuario, cerrarSesion } = useAuth();
+  const visibles = usuario
+    ? links.filter((link) => !link.roles || link.roles.includes(usuario.rol))
+    : [];
+
   return (
     <div className="flex min-h-svh flex-col">
       <header className="border-b">
         <div className="mx-auto flex max-w-6xl flex-col gap-2 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
-          <span className="font-heading text-lg font-semibold">DSW Estacionamiento</span>
-          <nav className="flex flex-wrap gap-x-4 gap-y-1 text-sm">
-            {links.map((link) => (
-              <NavLink
-                key={link.to}
-                to={link.to}
-                end={link.to === '/'}
-                className={({ isActive }) =>
-                  cn('text-muted-foreground hover:text-foreground', isActive && 'text-foreground')
-                }
-              >
-                {link.label}
-              </NavLink>
-            ))}
-          </nav>
+          <span className="font-heading text-lg font-semibold">Estacionamiento</span>
+          {usuario && (
+            <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+              <nav className="flex flex-wrap gap-x-4 gap-y-1 text-sm">
+                {visibles.map((link) => (
+                  <NavLink
+                    key={link.to}
+                    to={link.to}
+                    end={link.to === '/'}
+                    className={({ isActive }) =>
+                      cn(
+                        'text-muted-foreground hover:text-foreground',
+                        isActive && 'text-foreground',
+                      )
+                    }
+                  >
+                    {link.label}
+                  </NavLink>
+                ))}
+              </nav>
+              <div className="flex items-center gap-2 text-sm">
+                <span className="max-w-40 truncate">{usuario.nombre}</span>
+                <Badge variant="secondary">{usuario.rol === 'ADMIN' ? 'Admin' : 'Cliente'}</Badge>
+                <Button variant="outline" size="sm" onClick={cerrarSesion}>
+                  <LogOut aria-hidden />
+                  Salir
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
       </header>
 
