@@ -4,10 +4,11 @@
 export const ROLES = ['ADMIN', 'CLIENTE'] as const;
 export type Rol = (typeof ROLES)[number];
 
-export const ESTADOS_RESERVA = ['PENDIENTE', 'ACTIVA', 'FINALIZADA', 'CANCELADA'] as const;
+export const ESTADOS_RESERVA = ['PENDIENTE', 'ACTIVA', 'PAGADA', 'CANCELADA'] as const;
 export type EstadoReserva = (typeof ESTADOS_RESERVA)[number];
 
-export const ESTADOS_COCHERA = ['DISPONIBLE', 'OCUPADA', 'INHABILITADA'] as const;
+// Si esta ocupada ahora no es un estado: la API lo calcula y lo manda en `ocupada`
+export const ESTADOS_COCHERA = ['DISPONIBLE', 'INHABILITADA'] as const;
 export type EstadoCochera = (typeof ESTADOS_COCHERA)[number];
 
 export const METODOS_PAGO = ['EFECTIVO', 'TARJETA', 'TRANSFERENCIA'] as const;
@@ -58,6 +59,8 @@ export interface Cochera extends Timestamps {
   techada: boolean;
   estado: EstadoCochera;
   playaId: number;
+  /** Tiene una reserva aprobada (activa o pagada) en curso en este momento */
+  ocupada?: boolean;
   playa?: Playa;
 }
 

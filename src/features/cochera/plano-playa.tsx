@@ -2,7 +2,7 @@ import { Ban, Car, House, Plus, Sun } from 'lucide-react';
 import { useSyncExternalStore } from 'react';
 import { cn } from '@/lib/utils';
 import type { CocheraAdmin } from './cochera-admin.service';
-import { COLOR_ESTADO_COCHERA, ESTADO_COCHERA_LABEL } from './estado-cochera';
+import { COLOR_SITUACION_COCHERA, SITUACION_COCHERA_LABEL, situacionDe } from './estado-cochera';
 
 /** Desde el breakpoint sm de Tailwind entran 8 cocheras por fila; en celular, 4 */
 const MEDIA_SM = '(min-width: 40rem)';
@@ -108,18 +108,18 @@ interface EspacioCocheraProps {
 }
 
 function EspacioCochera({ cochera, atenuada, onClick }: EspacioCocheraProps) {
-  const IconoEstado =
-    cochera.estado === 'OCUPADA' ? Car : cochera.estado === 'INHABILITADA' ? Ban : null;
+  const situacion = situacionDe(cochera);
+  const IconoEstado = situacion === 'OCUPADA' ? Car : situacion === 'INHABILITADA' ? Ban : null;
   const IconoTecho = cochera.techada ? House : Sun;
 
   return (
     <button
       type="button"
       onClick={onClick}
-      aria-label={`Cochera ${cochera.id}, ${ESTADO_COCHERA_LABEL[cochera.estado].toLowerCase()}, ${cochera.techada ? 'techada' : 'descubierta'}. Editar`}
+      aria-label={`Cochera ${cochera.id}, ${SITUACION_COCHERA_LABEL[situacion].toLowerCase()}, ${cochera.techada ? 'techada' : 'descubierta'}. Editar`}
       className={cn(
         'focus-visible:ring-ring flex aspect-[3/4] w-full flex-col items-center justify-between rounded-md p-2 text-sm font-semibold ring-1 transition outline-none ring-inset hover:-translate-y-0.5 hover:shadow-md focus-visible:ring-2',
-        COLOR_ESTADO_COCHERA[cochera.estado],
+        COLOR_SITUACION_COCHERA[situacion],
         atenuada && 'opacity-25 hover:opacity-60',
       )}
     >

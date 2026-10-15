@@ -1,12 +1,24 @@
-import type { EstadoCochera } from './cochera-admin.service';
+import type { CocheraAdmin } from './cochera-admin.service';
 
-export const ESTADO_COCHERA_LABEL: Record<EstadoCochera, string> = {
+/**
+ * Lo que se ve en el plano: si el admin la inhabilito, o si esta ocupada en este momento
+ * (la API lo calcula con las reservas aprobadas en curso; no es un estado guardado).
+ */
+export const SITUACIONES_COCHERA = ['DISPONIBLE', 'OCUPADA', 'INHABILITADA'] as const;
+export type SituacionCochera = (typeof SITUACIONES_COCHERA)[number];
+
+export function situacionDe(cochera: Pick<CocheraAdmin, 'estado' | 'ocupada'>): SituacionCochera {
+  if (cochera.estado === 'INHABILITADA') return 'INHABILITADA';
+  return cochera.ocupada ? 'OCUPADA' : 'DISPONIBLE';
+}
+
+export const SITUACION_COCHERA_LABEL: Record<SituacionCochera, string> = {
   DISPONIBLE: 'Disponible',
-  OCUPADA: 'Ocupada',
+  OCUPADA: 'Ocupada ahora',
   INHABILITADA: 'Inhabilitada',
 };
 
-export const COLOR_ESTADO_COCHERA: Record<EstadoCochera, string> = {
+export const COLOR_SITUACION_COCHERA: Record<SituacionCochera, string> = {
   DISPONIBLE:
     'bg-emerald-100 text-emerald-900 ring-emerald-300 hover:bg-emerald-200 dark:bg-emerald-900/40 dark:text-emerald-200 dark:ring-emerald-800',
   OCUPADA:

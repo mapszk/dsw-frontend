@@ -8,7 +8,7 @@ export function PagosPage() {
 
   return (
     <section>
-      <PageHeader title="Pagos" description="Pagos registrados al finalizar las reservas." />
+      <PageHeader title="Pagos" description="Pagos registrados de las reservas aprobadas." />
 
       {pagos.isPending ? (
         <ListSkeleton />

@@ -3,7 +3,7 @@ import { useAuth } from '@/features/auth/use-auth';
 import { formatDuracion } from '@/lib/duracion';
 import { formatFechaHora, formatMoneda } from '@/lib/format';
 import type { MetodoPago, Reserva } from '@/types/models';
-import { ReservaAcciones } from './reserva-acciones';
+import { RegistrarPagoButton } from './reserva-acciones';
 
 const METODO_PAGO_LABEL: Record<MetodoPago, string> = {
   EFECTIVO: 'Efectivo',
@@ -90,14 +90,12 @@ export function ReservaDetalle({ reserva }: { reserva: Reserva }) {
             </dl>
           ) : (
             <p className="text-muted-foreground text-sm">
-              Sin pago registrado. Se registra al finalizar la reserva.
+              Sin pago registrado. Se registra cuando la reserva está activa.
             </p>
           )}
-          <ReservaAcciones
-            reservaId={reserva.id}
-            estado={reserva.estado}
-            esAdmin={sesion?.rol === 'ADMIN'}
-          />
+          {sesion?.rol === 'ADMIN' && reserva.estado === 'ACTIVA' && (
+            <RegistrarPagoButton reservaId={reserva.id} />
+          )}
         </CardContent>
       </Card>
     </div>

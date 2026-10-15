@@ -9,7 +9,7 @@ import {
   type PlayaOpcion,
 } from './cochera-admin.service';
 import { CampoSelect } from './campo-select';
-import { ESTADO_COCHERA_LABEL } from './estado-cochera';
+import { SITUACION_COCHERA_LABEL } from './estado-cochera';
 
 interface CocheraFormProps {
   inicial?: CocheraAdmin;
@@ -91,7 +91,7 @@ export function CocheraForm({
             id="cochera-estado"
             etiqueta="Estado"
             valor={field.value}
-            opciones={ESTADOS_COCHERA.map((e) => ({ valor: e, texto: ESTADO_COCHERA_LABEL[e] }))}
+            opciones={ESTADOS_COCHERA.map((e) => ({ valor: e, texto: SITUACION_COCHERA_LABEL[e] }))}
             error={errors.estado?.message}
             onCambio={field.onChange}
           />

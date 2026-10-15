@@ -13,8 +13,14 @@ import {
 } from '@/components/ui/dialog';
 import { EditarReservaForm } from '@/features/reserva/editar-reserva-form';
 import { useAuth } from '@/features/auth/use-auth';
-import { puedeCancelarse, puedeEditarse, puedeEliminarse } from '@/features/reserva/estado-reserva';
+import {
+  estaVencida,
+  puedeCancelarse,
+  puedeEditarse,
+  puedeEliminarse,
+} from '@/features/reserva/estado-reserva';
 import { EstadoReservaBadge } from '@/features/reserva/estado-reserva-badge';
+import { AprobarReservaButton } from '@/features/reserva/reserva-acciones';
 import { ReprogramarReservaDialog } from '@/features/reserva/reprogramar-reserva-dialog';
 import { ReservaDetalle } from '@/features/reserva/reserva-detalle';
 import type { ActualizarReservaInput } from '@/features/reserva/reserva.service';
@@ -66,9 +72,13 @@ export function ReservaDetallePage() {
               <h1 className="font-heading font-mono text-2xl font-semibold">
                 {reserva.data.patente}
               </h1>
-              <EstadoReservaBadge estado={reserva.data.estado} />
+              <EstadoReservaBadge reserva={reserva.data} />
             </div>
             <div className="flex flex-wrap gap-2">
+              {/* La API no deja aprobar una reserva vencida */}
+              {esAdmin && reserva.data.estado === 'PENDIENTE' && !estaVencida(reserva.data) && (
+                <AprobarReservaButton reservaId={reserva.data.id} />
+              )}
               {puedeEditarse(reserva.data.estado) && (
                 <Button variant="outline" onClick={() => setEditando(true)}>
                   <PencilIcon /> Editar
@@ -80,7 +90,7 @@ export function ReservaDetallePage() {
                   <CalendarClockIcon /> Reprogramar
                 </Button>
               )}
-              {usuario && puedeCancelarse(reserva.data.estado, usuario.rol) && (
+              {usuario && puedeCancelarse(reserva.data, usuario.rol) && (
                 <Button variant="outline" onClick={() => setCancelando(true)}>
                   <BanIcon /> Cancelar reserva
                 </Button>

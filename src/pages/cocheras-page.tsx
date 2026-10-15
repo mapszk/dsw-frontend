@@ -23,14 +23,15 @@ import {
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { CampoSelect } from '@/features/cochera/campo-select';
-import {
-  ESTADOS_COCHERA,
-  type CocheraAdmin,
-  type EstadoCochera,
-  type FiltrosCocheras,
-} from '@/features/cochera/cochera-admin.service';
+import type { CocheraAdmin, FiltrosCocheras } from '@/features/cochera/cochera-admin.service';
 import { CocheraForm } from '@/features/cochera/cochera-form';
-import { COLOR_ESTADO_COCHERA, ESTADO_COCHERA_LABEL } from '@/features/cochera/estado-cochera';
+import {
+  COLOR_SITUACION_COCHERA,
+  SITUACION_COCHERA_LABEL,
+  SITUACIONES_COCHERA,
+  situacionDe,
+  type SituacionCochera,
+} from '@/features/cochera/estado-cochera';
 import { PlanoPlaya } from '@/features/cochera/plano-playa';
 import {
   useCocherasAdmin,
@@ -43,11 +44,14 @@ import { cn } from '@/lib/utils';
 const TODAS = 'todas';
 const SIN_FILTROS: FiltrosCocheras = {};
 
-type Filtros = Omit<FiltrosCocheras, 'playaId'>;
+interface Filtros {
+  situacion?: SituacionCochera;
+  techada?: boolean;
+}
 
 function coincideCon(filtros: Filtros) {
   return (cochera: CocheraAdmin) =>
-    (!filtros.estado || cochera.estado === filtros.estado) &&
+    (!filtros.situacion || situacionDe(cochera) === filtros.situacion) &&
     (filtros.techada === undefined || cochera.techada === filtros.techada);
 }
 
@@ -69,7 +73,7 @@ export function CocherasPage() {
   const playaActiva = playaElegida ?? String(listaPlayas[0]?.id ?? '');
   const deLaPlaya = todas.filter((c) => String(c.playaId) === playaActiva);
   const coincide = coincideCon(filtros);
-  const hayFiltros = filtros.estado !== undefined || filtros.techada !== undefined;
+  const hayFiltros = filtros.situacion !== undefined || filtros.techada !== undefined;
 
   const formularioAbierto = creando || editando !== null;
   const cerrarFormulario = () => {
@@ -129,15 +133,18 @@ export function CocherasPage() {
                 <CampoSelect
                   id="filtro-estado"
                   etiqueta="Estado"
-                  valor={filtros.estado ?? TODAS}
+                  valor={filtros.situacion ?? TODAS}
                   opciones={[
                     { valor: TODAS, texto: 'Todos' },
-                    ...ESTADOS_COCHERA.map((e) => ({ valor: e, texto: ESTADO_COCHERA_LABEL[e] })),
+                    ...SITUACIONES_COCHERA.map((s) => ({
+                      valor: s,
+                      texto: SITUACION_COCHERA_LABEL[s],
+                    })),
                   ]}
                   onCambio={(valor) =>
                     setFiltros((previo) => ({
                       ...previo,
-                      estado: valor === TODAS ? undefined : (valor as EstadoCochera),
+                      situacion: valor === TODAS ? undefined : (valor as SituacionCochera),
                     }))
                   }
                 />
@@ -163,18 +170,18 @@ export function CocherasPage() {
                 className="flex flex-wrap gap-x-4 gap-y-2 text-sm lg:flex-col"
                 aria-label="Resumen"
               >
-                {ESTADOS_COCHERA.map((estado) => (
-                  <li key={estado} className="flex items-center gap-2">
+                {SITUACIONES_COCHERA.map((situacion) => (
+                  <li key={situacion} className="flex items-center gap-2">
                     <span
                       aria-hidden
                       className={cn(
                         'size-3.5 rounded-sm ring-1 ring-inset',
-                        COLOR_ESTADO_COCHERA[estado],
+                        COLOR_SITUACION_COCHERA[situacion],
                       )}
                     />
-                    {ESTADO_COCHERA_LABEL[estado]}
+                    {SITUACION_COCHERA_LABEL[situacion]}
                     <span className="text-muted-foreground">
-                      {deLaPlaya.filter((c) => c.estado === estado).length}
+                      {deLaPlaya.filter((c) => situacionDe(c) === situacion).length}
                     </span>
                   </li>
                 ))}
@@ -220,8 +227,13 @@ export function CocherasPage() {
             <DialogTitle className="flex items-center gap-2">
               {editando ? `Cochera #${editando.id}` : 'Nueva cochera'}
               {editando && (
-                <Badge className={cn('border-transparent', COLOR_ESTADO_COCHERA[editando.estado])}>
-                  {ESTADO_COCHERA_LABEL[editando.estado]}
+                <Badge
+                  className={cn(
+                    'border-transparent',
+                    COLOR_SITUACION_COCHERA[situacionDe(editando)],
+                  )}
+                >
+                  {SITUACION_COCHERA_LABEL[situacionDe(editando)]}
                 </Badge>
               )}
             </DialogTitle>
