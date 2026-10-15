@@ -1,4 +1,10 @@
-import { estaVencida, puedeCancelarse, puedeEliminarse } from './estado-reserva';
+import {
+  estaVencida,
+  puedeCancelarse,
+  puedeEliminarse,
+  tienePagoPendiente,
+  vistaDe,
+} from './estado-reserva';
 
 const ahora = new Date('2026-10-15T12:00:00Z');
 const futura = { fechaInicio: '2026-10-20T10:00:00Z', fechaFin: '2026-10-20T12:00:00Z' };
@@ -20,11 +26,25 @@ describe('reglas de estado de una reserva', () => {
     expect(puedeCancelarse({ estado: 'CANCELADA', ...futura }, 'ADMIN', ahora)).toBe(false);
   });
 
-  it('una pendiente o activa cuyo horario termino esta vencida', () => {
+  it('una pendiente cuyo horario termino esta vencida', () => {
     expect(estaVencida({ estado: 'PENDIENTE', ...terminada }, ahora)).toBe(true);
-    expect(estaVencida({ estado: 'ACTIVA', ...terminada }, ahora)).toBe(true);
-    expect(estaVencida({ estado: 'ACTIVA', ...empezada }, ahora)).toBe(false);
-    expect(estaVencida({ estado: 'PAGADA', ...terminada }, ahora)).toBe(false);
+    expect(estaVencida({ estado: 'PENDIENTE', ...empezada }, ahora)).toBe(false);
+    expect(estaVencida({ estado: 'ACTIVA', ...terminada }, ahora)).toBe(false);
+  });
+
+  it('una aprobada sin pagar cuyo horario termino tiene el pago pendiente', () => {
+    expect(tienePagoPendiente({ estado: 'ACTIVA', ...terminada }, ahora)).toBe(true);
+    expect(tienePagoPendiente({ estado: 'ACTIVA', ...empezada }, ahora)).toBe(false);
+    expect(tienePagoPendiente({ estado: 'PAGADA', ...terminada }, ahora)).toBe(false);
+  });
+
+  it('las aprobadas, pagadas o no, son activas hasta que termina su horario', () => {
+    expect(vistaDe({ estado: 'ACTIVA', ...futura }, ahora)).toBe('ACTIVAS');
+    expect(vistaDe({ estado: 'PAGADA', ...empezada }, ahora)).toBe('ACTIVAS');
+    expect(vistaDe({ estado: 'ACTIVA', ...terminada }, ahora)).toBe('FINALIZADAS');
+    expect(vistaDe({ estado: 'PAGADA', ...terminada }, ahora)).toBe('FINALIZADAS');
+    expect(vistaDe({ estado: 'PENDIENTE', ...terminada }, ahora)).toBe('PENDIENTES');
+    expect(vistaDe({ estado: 'CANCELADA', ...futura }, ahora)).toBe('CANCELADAS');
   });
 
   it('se eliminan reservas pendientes o canceladas', () => {

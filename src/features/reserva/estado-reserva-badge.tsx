@@ -1,7 +1,7 @@
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import type { EstadoReserva, Reserva } from '@/types/models';
-import { ESTADO_RESERVA_LABEL, estaVencida } from './estado-reserva';
+import { ESTADO_RESERVA_LABEL, estaVencida, tienePagoPendiente } from './estado-reserva';
 
 const colores: Record<EstadoReserva, string> = {
   PENDIENTE: 'bg-amber-100 text-amber-900 dark:bg-amber-900/40 dark:text-amber-200',
@@ -20,9 +20,9 @@ export function EstadoReservaBadge({ reserva }: EstadoReservaBadgeProps) {
       <Badge className={cn('border-transparent', colores[reserva.estado])}>
         {ESTADO_RESERVA_LABEL[reserva.estado]}
       </Badge>
-      {estaVencida(reserva) && (
+      {(estaVencida(reserva) || tienePagoPendiente(reserva)) && (
         <Badge variant="outline" className="text-destructive border-destructive/30">
-          Vencida
+          {estaVencida(reserva) ? 'Vencida' : 'Pago pendiente'}
         </Badge>
       )}
     </span>

@@ -3,28 +3,36 @@ import { Link, useSearchParams } from 'react-router';
 import { EmptyMessage, ErrorMessage, ListSkeleton } from '@/components/query-states';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ESTADO_RESERVA_LABEL } from '@/features/reserva/estado-reserva';
+import {
+  VISTA_RESERVA_LABEL,
+  VISTAS_RESERVA,
+  vistaDe,
+  type VistaReserva,
+} from '@/features/reserva/estado-reserva';
 import { ReservaList } from '@/features/reserva/reserva-list';
 import { useReservas } from '@/features/reserva/use-reservas';
-import { ESTADOS_RESERVA, type EstadoReserva } from '@/types/models';
 
 const TODAS = 'TODAS';
 /** Sin filtro en la URL se muestran las pendientes, que son las que hay que atender */
-const POR_DEFECTO: EstadoReserva = 'PENDIENTE';
+const POR_DEFECTO: VistaReserva = 'PENDIENTES';
 
-function parseEstado(valor: string | null): EstadoReserva | undefined {
+function parseVista(valor: string | null): VistaReserva | undefined {
   if (valor === TODAS) return undefined;
-  return ESTADOS_RESERVA.find((estado) => estado === valor) ?? POR_DEFECTO;
+  return VISTAS_RESERVA.find((vista) => vista === valor) ?? POR_DEFECTO;
 }
 
 export function ReservasPage() {
-  // El filtro vive en la URL (?estado=ACTIVA, ?estado=TODAS) para poder compartirlo y volver atras
+  // La pestaña vive en la URL (?vista=ACTIVAS, ?vista=TODAS) para poder compartirla y volver atras
   const [searchParams, setSearchParams] = useSearchParams();
-  const estado = parseEstado(searchParams.get('estado'));
-  const reservas = useReservas({ estado });
+  const vista = parseVista(searchParams.get('vista'));
+  // Activas y finalizadas dependen del horario, no solo del estado: se filtra aca
+  const reservas = useReservas();
+  const visibles = vista
+    ? (reservas.data ?? []).filter((reserva) => vistaDe(reserva) === vista)
+    : (reservas.data ?? []);
 
-  const cambiarEstado = (valor: string) =>
-    setSearchParams(valor === POR_DEFECTO ? {} : { estado: valor }, { replace: true });
+  const cambiarVista = (valor: string) =>
+    setSearchParams(valor === POR_DEFECTO ? {} : { vista: valor }, { replace: true });
 
   return (
     <section className="flex flex-col gap-4">
@@ -40,15 +48,15 @@ export function ReservasPage() {
         </Button>
       </div>
 
-      <Tabs value={estado ?? TODAS} onValueChange={cambiarEstado}>
+      <Tabs value={vista ?? TODAS} onValueChange={cambiarVista}>
         <div className="-mx-4 overflow-x-auto overflow-y-hidden px-4 py-0.5 sm:mx-0 sm:px-0">
           <TabsList>
-            <TabsTrigger value={TODAS}>Todas</TabsTrigger>
-            {ESTADOS_RESERVA.map((valor) => (
+            {VISTAS_RESERVA.map((valor) => (
               <TabsTrigger key={valor} value={valor}>
-                {ESTADO_RESERVA_LABEL[valor]}
+                {VISTA_RESERVA_LABEL[valor]}
               </TabsTrigger>
             ))}
+            <TabsTrigger value={TODAS}>Todas</TabsTrigger>
           </TabsList>
         </div>
       </Tabs>
@@ -57,14 +65,14 @@ export function ReservasPage() {
         <ListSkeleton />
       ) : reservas.isError ? (
         <ErrorMessage message={reservas.error.message} onRetry={() => reservas.refetch()} />
-      ) : reservas.data.length === 0 ? (
+      ) : visibles.length === 0 ? (
         <EmptyMessage>
-          {estado
-            ? `No hay reservas en estado ${ESTADO_RESERVA_LABEL[estado].toLowerCase()}.`
+          {vista
+            ? `No hay reservas ${VISTA_RESERVA_LABEL[vista].toLowerCase()}.`
             : 'No hay reservas.'}
         </EmptyMessage>
       ) : (
-        <ReservaList reservas={reservas.data} />
+        <ReservaList reservas={visibles} />
       )}
     </section>
   );
