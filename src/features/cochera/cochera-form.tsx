@@ -9,16 +9,26 @@ import {
   type PlayaOpcion,
 } from './cochera-admin.service';
 import { CampoSelect } from './campo-select';
+import { ESTADO_COCHERA_LABEL } from './estado-cochera';
 
 interface CocheraFormProps {
   inicial?: CocheraAdmin;
+  /** Playa preseleccionada al crear una cochera nueva */
+  playaIdInicial?: number;
   playas: PlayaOpcion[];
   guardando: boolean;
   onSubmit: (data: CocheraInput) => void;
   onCancel: () => void;
 }
 
-export function CocheraForm({ inicial, playas, guardando, onSubmit, onCancel }: CocheraFormProps) {
+export function CocheraForm({
+  inicial,
+  playaIdInicial,
+  playas,
+  guardando,
+  onSubmit,
+  onCancel,
+}: CocheraFormProps) {
   const {
     control,
     handleSubmit,
@@ -28,7 +38,7 @@ export function CocheraForm({ inicial, playas, guardando, onSubmit, onCancel }: 
     defaultValues: {
       techada: inicial?.techada ? 'si' : 'no',
       estado: inicial?.estado ?? 'DISPONIBLE',
-      playaId: inicial ? String(inicial.playaId) : '',
+      playaId: String(inicial?.playaId ?? playaIdInicial ?? ''),
     },
   });
 
@@ -50,7 +60,7 @@ export function CocheraForm({ inicial, playas, guardando, onSubmit, onCancel }: 
             id="cochera-playa"
             etiqueta="Playa"
             valor={field.value}
-            opciones={playas.map((p) => ({ valor: String(p.id), texto: p.sector }))}
+            opciones={playas.map((p) => ({ valor: String(p.id), texto: `Playa ${p.sector}` }))}
             error={errors.playaId?.message}
             onCambio={field.onChange}
           />
@@ -81,7 +91,7 @@ export function CocheraForm({ inicial, playas, guardando, onSubmit, onCancel }: 
             id="cochera-estado"
             etiqueta="Estado"
             valor={field.value}
-            opciones={ESTADOS_COCHERA.map((e) => ({ valor: e, texto: e }))}
+            opciones={ESTADOS_COCHERA.map((e) => ({ valor: e, texto: ESTADO_COCHERA_LABEL[e] }))}
             error={errors.estado?.message}
             onCambio={field.onChange}
           />
