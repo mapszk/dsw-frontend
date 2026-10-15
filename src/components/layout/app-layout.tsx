@@ -15,6 +15,7 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import { Link, NavLink, Outlet, useLocation } from 'react-router';
+import { Brand } from '@/components/brand';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -98,7 +99,7 @@ function navegacionVisible(rol: Rol): NavEntry[] {
 const navItemClass =
   'text-muted-foreground hover:bg-background/70 hover:text-foreground flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium whitespace-nowrap transition-colors';
 const navItemActiveClass =
-  'bg-background text-foreground hover:bg-background shadow-sm ring-1 ring-black/5';
+  'bg-card text-primary hover:bg-card hover:text-primary shadow-sm ring-1 ring-primary/15';
 
 function NavGroupMenu({ group }: { group: NavGroup }) {
   const { pathname } = useLocation();
@@ -135,7 +136,7 @@ function NavGroupMenu({ group }: { group: NavGroup }) {
 
 const mobileItemClass =
   'text-muted-foreground hover:bg-muted hover:text-foreground flex items-center gap-3 rounded-lg px-3 py-3 text-base font-medium transition-colors';
-const mobileItemActiveClass = 'bg-muted text-foreground';
+const mobileItemActiveClass = 'bg-primary/10 text-primary hover:bg-primary/10 hover:text-primary';
 
 interface MobileNavLinkProps {
   item: NavItem;
@@ -235,37 +236,40 @@ export function AppLayout() {
   return (
     <div className="flex min-h-svh flex-col">
       {usuario ? (
-        <header className="bg-background/95 supports-backdrop-filter:bg-background/80 sticky top-0 z-40 border-b backdrop-blur">
+        <header className="bg-card/95 supports-backdrop-filter:bg-card/80 border-t-primary sticky top-0 z-40 border-t-3 border-b backdrop-blur">
           <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3">
-            <div className="flex min-w-0 items-center gap-3">
+            <div className="flex min-w-0 items-center gap-1">
               <MobileNav
                 entries={visibles}
                 nombre={usuario.nombre}
                 rol={usuario.rol}
                 onCerrarSesion={cerrarSesion}
               />
-              <span
-                aria-hidden
-                className="bg-primary text-primary-foreground flex size-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold"
-              >
-                {iniciales(usuario.nombre)}
-              </span>
-              <div className="flex min-w-0 flex-col leading-tight">
+              <Brand />
+            </div>
+            <div className="flex min-w-0 items-center gap-3">
+              <div className="hidden min-w-0 flex-col text-right leading-tight sm:flex">
                 <span className="truncate text-sm font-medium">{usuario.nombre}</span>
                 <span className="text-muted-foreground text-xs">
                   {usuario.rol === 'ADMIN' ? 'Administrador' : 'Cliente'}
                 </span>
               </div>
+              <span
+                aria-hidden
+                className="bg-primary/10 text-primary ring-primary/20 flex size-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold ring-1"
+              >
+                {iniciales(usuario.nombre)}
+              </span>
+              <Button
+                variant="outline"
+                size="sm"
+                className="hidden md:inline-flex"
+                onClick={cerrarSesion}
+              >
+                <LogOut aria-hidden />
+                Salir
+              </Button>
             </div>
-            <Button
-              variant="outline"
-              size="sm"
-              className="hidden md:inline-flex"
-              onClick={cerrarSesion}
-            >
-              <LogOut aria-hidden />
-              Salir
-            </Button>
           </div>
 
           <nav aria-label="Secciones" className="mx-auto hidden max-w-6xl px-4 pb-3 md:block">
@@ -298,9 +302,9 @@ export function AppLayout() {
           </nav>
         </header>
       ) : (
-        <header className="border-b">
+        <header className="bg-card border-t-primary border-t-3 border-b">
           <div className="mx-auto max-w-6xl px-4 py-3">
-            <span className="font-heading text-lg font-semibold">Estacionamiento</span>
+            <Brand />
           </div>
         </header>
       )}

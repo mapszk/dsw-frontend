@@ -26,6 +26,7 @@ import {
   type EstadoCochera,
   type FiltrosCocheras,
 } from '@/features/cochera/cochera-admin.service';
+import { cn } from '@/lib/utils';
 import { CocheraForm } from '@/features/cochera/cochera-form';
 import {
   useCocherasAdmin,
@@ -36,10 +37,10 @@ import {
 
 const TODAS = 'todas';
 
-const VARIANTE_ESTADO: Record<EstadoCochera, 'default' | 'secondary' | 'destructive'> = {
-  DISPONIBLE: 'default',
-  OCUPADA: 'secondary',
-  INHABILITADA: 'destructive',
+const COLOR_ESTADO: Record<EstadoCochera, string> = {
+  DISPONIBLE: 'bg-emerald-100 text-emerald-900 dark:bg-emerald-900/40 dark:text-emerald-200',
+  OCUPADA: 'bg-amber-100 text-amber-900 dark:bg-amber-900/40 dark:text-amber-200',
+  INHABILITADA: 'bg-muted text-muted-foreground',
 };
 
 export function CocherasPage() {
@@ -134,11 +135,13 @@ export function CocherasPage() {
             <CardHeader>
               <CardTitle className="flex items-center justify-between text-base">
                 <span>Cochera #{cochera.id}</span>
-                <Badge variant={VARIANTE_ESTADO[cochera.estado]}>{cochera.estado}</Badge>
+                <Badge className={cn('border-transparent', COLOR_ESTADO[cochera.estado])}>
+                  {cochera.estado}
+                </Badge>
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              <p className="text-sm text-muted-foreground">
+              <p className="text-muted-foreground text-sm">
                 Playa {cochera.playa?.sector ?? cochera.playaId} ·{' '}
                 {cochera.techada ? 'Techada' : 'Descubierta'}
               </p>

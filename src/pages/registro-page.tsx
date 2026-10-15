@@ -27,7 +27,7 @@ export function RegistroPage() {
           />
           <p className="text-muted-foreground text-center text-sm">
             ¿Ya tenés cuenta?{' '}
-            <Link to="/login" className="text-foreground underline">
+            <Link to="/login" className="text-primary font-medium underline-offset-4 hover:underline">
               Ingresá
             </Link>
           </p>
