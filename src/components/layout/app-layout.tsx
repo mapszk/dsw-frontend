@@ -7,6 +7,7 @@ import {
   Receipt,
   Users,
   Warehouse,
+  ParkingSquare,
   type LucideIcon,
 } from 'lucide-react';
 import { NavLink, Outlet } from 'react-router';
@@ -32,6 +33,7 @@ const links: NavItem[] = [
   { to: '/tarifas', label: 'Tarifas', icon: BadgeDollarSign, roles: ['ADMIN'] },
   { to: '/cocheras', label: 'Cocheras', icon: Warehouse, roles: ['ADMIN'] },
   { to: '/pagos', label: 'Pagos', icon: Receipt, roles: ['ADMIN'] },
+  { to: '/playas', label: 'Playas', icon: ParkingSquare, roles: ['ADMIN'] },
 ];
 
 function iniciales(nombre: string) {

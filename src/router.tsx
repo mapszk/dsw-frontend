@@ -13,6 +13,7 @@ import { TiposVehiculoPage } from '@/pages/tipos-vehiculo-page';
 import { UsuariosPage } from '@/pages/usuarios-page';
 import { CocherasPage } from '@/pages/cocheras-page';
 import { PagosPage } from '@/pages/pagos-page';
+import { PlayasPage } from '@/pages/playas-page';
 
 
 export const router = createBrowserRouter([
@@ -48,6 +49,7 @@ export const router = createBrowserRouter([
           { path: '/tarifas', element: <TarifasPage /> },
           { path: '/cocheras', element: <CocherasPage /> },
           { path: '/pagos', element: <PagosPage /> },
+          { path: '/playas', element: <PlayasPage /> },
         ],
       },
       { path: '*', element: <NotFoundPage /> },
