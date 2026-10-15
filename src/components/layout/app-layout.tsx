@@ -4,7 +4,9 @@ import {
   Car,
   Clock,
   LogOut,
+  Receipt,
   Users,
+  Warehouse,
   type LucideIcon,
 } from 'lucide-react';
 import { NavLink, Outlet } from 'react-router';
@@ -28,6 +30,8 @@ const links: NavItem[] = [
   { to: '/tipos-vehiculo', label: 'Tipos de vehículo', icon: Car, roles: ['ADMIN'] },
   { to: '/tipos-estadia', label: 'Tipos de estadía', icon: Clock, roles: ['ADMIN'] },
   { to: '/tarifas', label: 'Tarifas', icon: BadgeDollarSign, roles: ['ADMIN'] },
+  { to: '/cocheras', label: 'Cocheras', icon: Warehouse, roles: ['ADMIN'] },
+  { to: '/pagos', label: 'Pagos', icon: Receipt, roles: ['ADMIN'] },
 ];
 
 function iniciales(nombre: string) {
