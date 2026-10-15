@@ -11,6 +11,8 @@ import { TarifasPage } from '@/pages/tarifas-page';
 import { TiposEstadiaPage } from '@/pages/tipos-estadia-page';
 import { TiposVehiculoPage } from '@/pages/tipos-vehiculo-page';
 import { UsuariosPage } from '@/pages/usuarios-page';
+import { PlayasPage } from '@/pages/playas-page';
+
 
 export const router = createBrowserRouter([
   {
@@ -42,6 +44,7 @@ export const router = createBrowserRouter([
           { path: '/tipos-vehiculo', element: <TiposVehiculoPage /> },
           { path: '/tipos-estadia', element: <TiposEstadiaPage /> },
           { path: '/tarifas', element: <TarifasPage /> },
+          { path: '/playas', element: <PlayasPage /> },
         ],
       },
       { path: '*', element: <NotFoundPage /> },
