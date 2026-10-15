@@ -29,7 +29,8 @@ export function crearReservaSchema({ elegirCliente }: { elegirCliente: boolean }
     .object({
       patente,
       fechaInicio: fecha('Ingresá la fecha de inicio'),
-      fechaFin: fecha('Ingresá la fecha de fin'),
+      // Cantidad de unidades del tipo de estadia: el fin se calcula a partir del inicio
+      cantidad: z.number().int().min(1, 'Indicá la duración'),
       usuarioId: elegirCliente ? opcion('Elegí un cliente') : z.string(),
       cocheraId: opcion('Elegí una cochera'),
       tipoVehiculoId: opcion('Elegí un tipo de vehículo'),
@@ -38,12 +39,7 @@ export function crearReservaSchema({ elegirCliente }: { elegirCliente: boolean }
     .refine((data) => !data.fechaInicio || new Date(data.fechaInicio) > new Date(), {
       message: 'La fecha de inicio no puede estar en el pasado',
       path: ['fechaInicio'],
-    })
-    .refine(
-      (data) =>
-        !data.fechaInicio || !data.fechaFin || new Date(data.fechaFin) > new Date(data.fechaInicio),
-      { message: 'La fecha de fin debe ser posterior a la de inicio', path: ['fechaFin'] },
-    );
+    });
 }
 
 export const editarReservaSchema = z.object({ patente });
