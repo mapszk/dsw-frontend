@@ -34,7 +34,7 @@ export function ReservaList({ reservas }: ReservaListProps) {
               <div className="flex min-w-0 flex-col gap-1">
                 <div className="flex items-center gap-2">
                   <span className="font-mono font-medium">{reserva.patente}</span>
-                  <EstadoReservaBadge estado={reserva.estado} />
+                  <EstadoReservaBadge reserva={reserva} />
                 </div>
                 <p className="truncate text-sm">{reserva.usuario.nombre}</p>
                 <p className="text-muted-foreground text-xs">
@@ -79,7 +79,7 @@ export function ReservaList({ reservas }: ReservaListProps) {
                   {formatFechaHora(reserva.fechaFin)}
                 </TableCell>
                 <TableCell>
-                  <EstadoReservaBadge estado={reserva.estado} />
+                  <EstadoReservaBadge reserva={reserva} />
                 </TableCell>
                 <TableCell className="text-right">{formatMoneda(reserva.precioTotal)}</TableCell>
                 <TableCell className="text-right">

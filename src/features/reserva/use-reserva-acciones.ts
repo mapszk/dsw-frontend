@@ -16,26 +16,26 @@ function useRefrescar() {
     );
 }
 
-export function useIniciarReserva() {
+export function useAprobarReserva() {
   const refrescar = useRefrescar();
   return useMutation({
-    mutationFn: (id: number) => reservaAccionesService.iniciar(id),
+    mutationFn: (id: number) => reservaAccionesService.aprobar(id),
     onSuccess: async () => {
       await refrescar();
-      toast.success('Reserva iniciada');
+      toast.success('Reserva aprobada');
     },
     onError: (error) => toast.error(mensajeDe(error)),
   });
 }
 
-export function useFinalizarReserva() {
+export function useRegistrarPago() {
   const refrescar = useRefrescar();
   return useMutation({
     mutationFn: ({ id, metodo }: { id: number; metodo: MetodoPago }) =>
-      reservaAccionesService.finalizar(id, metodo),
+      reservaAccionesService.registrarPago(id, metodo),
     onSuccess: async () => {
       await refrescar();
-      toast.success('Reserva finalizada y pago registrado');
+      toast.success('Pago registrado');
     },
     onError: (error) => toast.error(mensajeDe(error)),
   });

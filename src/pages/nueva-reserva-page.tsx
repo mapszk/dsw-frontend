@@ -6,6 +6,7 @@ import type { OpcionesQuery } from '@/features/reserva/opcion-select';
 import { ReservaForm } from '@/features/reserva/reserva-form';
 import type { CrearReservaInput } from '@/features/reserva/reserva.service';
 import { useCrearReserva } from '@/features/reserva/use-reservas';
+import { useTarifas } from '@/features/tarifa/use-tarifas';
 import { useTiposEstadia } from '@/features/tipo-estadia/use-tipos-estadia';
 import { useTiposVehiculo } from '@/features/tipo-vehiculo/use-tipos-vehiculo';
 import { useUsuarios } from '@/features/usuario/use-usuarios';
@@ -35,6 +36,7 @@ export function NuevaReservaPage() {
   const cocheras = useCocheras();
   const tiposVehiculo = useTiposVehiculo();
   const tiposEstadia = useTiposEstadia();
+  const tarifas = useTarifas();
 
   const opciones = {
     usuarios: toOpciones(usuarios, (u) => ({ value: u.id, label: `${u.nombre} (DNI ${u.dni})` })),
@@ -60,13 +62,15 @@ export function NuevaReservaPage() {
         <CardHeader>
           <CardTitle>Nueva reserva</CardTitle>
           <CardDescription>
-            Se valida que la cochera esté libre en ese horario y se calcula el precio.
+            Completá los tres pasos y revisá el precio estimado antes de confirmar.
             {!esAdmin && ' La reserva queda a tu nombre.'}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <ReservaForm
             opciones={opciones}
+            tiposEstadia={tiposEstadia.data ?? []}
+            tarifas={tarifas.data ?? []}
             elegirCliente={esAdmin}
             onSubmit={guardar}
             onCancel={() => navigate('/reservas')}

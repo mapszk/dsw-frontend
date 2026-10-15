@@ -1,19 +1,10 @@
-import { Pencil, Plus, Trash2 } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { useState } from 'react';
 import { ConfirmDialog } from '@/components/confirm-dialog';
 import { PageHeader } from '@/components/page-header';
 import { EmptyMessage, ErrorMessage, ListSkeleton } from '@/components/query-states';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
 import { useAuth } from '@/features/auth/use-auth';
 import {
   useActualizarUsuario,
@@ -22,6 +13,7 @@ import {
   useUsuarios,
 } from '@/features/usuario/use-usuarios';
 import { UsuarioForm } from '@/features/usuario/usuario-form';
+import { UsuarioList } from '@/features/usuario/usuario-list';
 import type { Usuario } from '@/types/models';
 
 export function UsuariosPage() {
@@ -54,56 +46,12 @@ export function UsuariosPage() {
       ) : usuarios.data.length === 0 ? (
         <EmptyMessage>Todavía no hay usuarios.</EmptyMessage>
       ) : (
-        <div className="overflow-x-auto rounded-lg border">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Nombre</TableHead>
-                <TableHead>DNI</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Teléfono</TableHead>
-                <TableHead>Rol</TableHead>
-                <TableHead className="w-24 text-right">Acciones</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {usuarios.data.map((usuario) => (
-                <TableRow key={usuario.id}>
-                  <TableCell className="font-medium">{usuario.nombre}</TableCell>
-                  <TableCell>{usuario.dni}</TableCell>
-                  <TableCell>{usuario.email}</TableCell>
-                  <TableCell>{usuario.telefono ?? '-'}</TableCell>
-                  <TableCell>
-                    <Badge variant={usuario.rol === 'ADMIN' ? 'default' : 'secondary'}>
-                      {usuario.rol === 'ADMIN' ? 'Admin' : 'Cliente'}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-right whitespace-nowrap">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      aria-label={`Editar a ${usuario.nombre}`}
-                      onClick={() => setEditando(usuario)}
-                    >
-                      <Pencil />
-                    </Button>
-                    {/* No se puede eliminar el usuario con el que se esta logueado */}
-                    {usuario.id !== actual?.id && (
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        aria-label={`Eliminar a ${usuario.nombre}`}
-                        onClick={() => setAEliminar(usuario)}
-                      >
-                        <Trash2 />
-                      </Button>
-                    )}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+        <UsuarioList
+          usuarios={usuarios.data}
+          idActual={actual?.id}
+          onEditar={setEditando}
+          onEliminar={setAEliminar}
+        />
       )}
 
       <Dialog open={editando !== null} onOpenChange={(open) => !open && setEditando(null)}>

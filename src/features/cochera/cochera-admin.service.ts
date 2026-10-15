@@ -1,6 +1,6 @@
 import { apiClient } from '@/lib/api-client';
 
-export const ESTADOS_COCHERA = ['DISPONIBLE', 'OCUPADA', 'INHABILITADA'] as const;
+export const ESTADOS_COCHERA = ['DISPONIBLE', 'INHABILITADA'] as const;
 export type EstadoCochera = (typeof ESTADOS_COCHERA)[number];
 
 export interface CocheraAdmin {
@@ -8,6 +8,8 @@ export interface CocheraAdmin {
   techada: boolean;
   estado: EstadoCochera;
   playaId: number;
+  /** Calculado por la API: tiene una reserva aprobada en curso ahora */
+  ocupada: boolean;
   playa?: { id: number; sector: string };
 }
 
