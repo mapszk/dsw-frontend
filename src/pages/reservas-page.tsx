@@ -9,19 +9,22 @@ import { useReservas } from '@/features/reserva/use-reservas';
 import { ESTADOS_RESERVA, type EstadoReserva } from '@/types/models';
 
 const TODAS = 'TODAS';
+/** Sin filtro en la URL se muestran las pendientes, que son las que hay que atender */
+const POR_DEFECTO: EstadoReserva = 'PENDIENTE';
 
 function parseEstado(valor: string | null): EstadoReserva | undefined {
-  return ESTADOS_RESERVA.find((estado) => estado === valor);
+  if (valor === TODAS) return undefined;
+  return ESTADOS_RESERVA.find((estado) => estado === valor) ?? POR_DEFECTO;
 }
 
 export function ReservasPage() {
-  // El filtro vive en la URL (?estado=PENDIENTE) para poder compartirlo y volver atras
+  // El filtro vive en la URL (?estado=ACTIVA, ?estado=TODAS) para poder compartirlo y volver atras
   const [searchParams, setSearchParams] = useSearchParams();
   const estado = parseEstado(searchParams.get('estado'));
   const reservas = useReservas({ estado });
 
   const cambiarEstado = (valor: string) =>
-    setSearchParams(valor === TODAS ? {} : { estado: valor }, { replace: true });
+    setSearchParams(valor === POR_DEFECTO ? {} : { estado: valor }, { replace: true });
 
   return (
     <section className="flex flex-col gap-4">
