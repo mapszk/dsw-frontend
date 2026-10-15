@@ -1,7 +1,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useAuth } from '@/features/auth/use-auth';
 import { formatDuracion } from '@/lib/duracion';
 import { formatFechaHora, formatMoneda } from '@/lib/format';
 import type { MetodoPago, Reserva } from '@/types/models';
+import { ReservaAcciones } from './reserva-acciones';
 
 const METODO_PAGO_LABEL: Record<MetodoPago, string> = {
   EFECTIVO: 'Efectivo',
@@ -25,6 +27,7 @@ function Dato({ label, children }: DatoProps) {
 
 export function ReservaDetalle({ reserva }: { reserva: Reserva }) {
   const { usuario, cochera, pago } = reserva;
+  const { usuario: sesion } = useAuth();
 
   return (
     <div className="grid gap-4 md:grid-cols-2">
@@ -78,7 +81,7 @@ export function ReservaDetalle({ reserva }: { reserva: Reserva }) {
         <CardHeader>
           <CardTitle>Pago</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
           {pago ? (
             <dl className="grid grid-cols-2 gap-4 lg:grid-cols-4">
               <Dato label="Fecha">{formatFechaHora(pago.fecha)}</Dato>
@@ -90,6 +93,11 @@ export function ReservaDetalle({ reserva }: { reserva: Reserva }) {
               Sin pago registrado. Se registra al finalizar la reserva.
             </p>
           )}
+          <ReservaAcciones
+            reservaId={reserva.id}
+            estado={reserva.estado}
+            esAdmin={sesion?.rol === 'ADMIN'}
+          />
         </CardContent>
       </Card>
     </div>
