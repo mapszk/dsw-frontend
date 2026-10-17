@@ -35,11 +35,11 @@ async function elegir(user: ReturnType<typeof userEvent.setup>, campo: string, v
   await user.click(await screen.findByRole('option', { name: valor }));
 }
 
-/** El slider arranca en 1 hora: con la flecha derecha se suma una hora por vez */
+/** La duracion arranca en 1 hora: cada click en "Más" suma una hora */
 async function elegirHoras(user: ReturnType<typeof userEvent.setup>, horas: number) {
-  const slider = screen.getByRole('slider', { name: 'Duración' });
-  slider.focus();
-  await user.keyboard('{ArrowRight}'.repeat(horas - 1));
+  for (let i = 1; i < horas; i++) {
+    await user.click(screen.getByRole('button', { name: 'Más' }));
+  }
 }
 
 async function completarFormulario(user: ReturnType<typeof userEvent.setup>) {
