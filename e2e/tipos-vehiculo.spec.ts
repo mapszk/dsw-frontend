@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { ADMIN, ingresar, unico } from './helpers.ts';
+import { ADMIN, ingresar, irA, unico } from './helpers.ts';
 
 test('el admin crea, edita y elimina un tipo de vehiculo', async ({ page }) => {
   const tipo = `E2E${unico()}`;
@@ -7,8 +7,8 @@ test('el admin crea, edita y elimina un tipo de vehiculo', async ({ page }) => {
 
   await page.goto('/login');
   await ingresar(page, ADMIN);
-  await page.getByRole('link', { name: 'Tipos de vehículo' }).click();
-  await expect(page.getByRole('heading', { name: 'Tipos de vehículo' })).toBeVisible();
+  // En escritorio esta dentro del desplegable "Configuración"; en celular, en el menu lateral
+  await irA(page, 'Tipos de vehículo', 'Configuración');
 
   // Alta: la API lo guarda en mayusculas
   await page.getByRole('button', { name: 'Nuevo tipo' }).click();

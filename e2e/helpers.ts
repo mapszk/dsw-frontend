@@ -10,7 +10,50 @@ export async function ingresar(
   await page.getByLabel('Email').fill(email);
   await page.getByLabel('Contraseña').fill(password);
   await page.getByRole('button', { name: 'Ingresar' }).click();
-  await expect(page.getByRole('button', { name: 'Salir' })).toBeVisible();
+  await expect(page).not.toHaveURL(/\/login$/);
+}
+
+/** Menos de 768px (el breakpoint md): las secciones y "Salir" estan en un menu lateral */
+export function esCelular(page: Page) {
+  return (page.viewportSize()?.width ?? 1280) < 768;
+}
+
+/**
+ * Devuelve donde estan las secciones y "Salir": en escritorio, el encabezado; en celular,
+ * el menu lateral, que se abre primero (como lo haria una persona).
+ */
+export async function abrirMenu(page: Page) {
+  if (!esCelular(page)) return page.getByRole('banner');
+  await page.getByRole('button', { name: 'Abrir menú' }).click();
+  const menu = page.getByRole('dialog');
+  await expect(menu).toBeVisible();
+  return menu;
+}
+
+/**
+ * Navega a una seccion usando el menu. `grupo` es el desplegable que la contiene en escritorio
+ * ("Estacionamiento" o "Configuracion"); en celular todas estan en el menu lateral.
+ */
+export async function irA(page: Page, seccion: string, grupo?: string) {
+  if (esCelular(page)) {
+    const menu = await abrirMenu(page);
+    await menu.getByRole('link', { name: seccion }).click();
+  } else if (grupo) {
+    await page.getByRole('button', { name: grupo }).click();
+    await page.getByRole('menuitem', { name: seccion }).click();
+  } else {
+    await page
+      .getByRole('navigation', { name: 'Secciones' })
+      .getByRole('link', { name: seccion })
+      .click();
+  }
+  await expect(page.getByRole('heading', { name: seccion, level: 1 })).toBeVisible();
+}
+
+export async function salir(page: Page) {
+  const menu = await abrirMenu(page);
+  await menu.getByRole('button', { name: 'Salir' }).click();
+  await expect(page).toHaveURL(/\/login$/);
 }
 
 /**

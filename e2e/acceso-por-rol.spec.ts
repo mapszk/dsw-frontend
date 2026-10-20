@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { ADMIN, CLIENTE, ingresar, unico } from './helpers.ts';
+import { abrirMenu, ADMIN, CLIENTE, esCelular, ingresar, irA, salir, unico } from './helpers.ts';
 
 test('una ruta protegida pide login y un cliente no accede a secciones de admin', async ({
   page,
@@ -13,7 +13,12 @@ test('una ruta protegida pide login y un cliente no accede a secciones de admin'
   // Vuelve a la ruta que habia pedido, pero sin permisos
   await expect(page).toHaveURL(/\/tarifas$/);
   await expect(page.getByRole('heading', { name: 'Sin permisos' })).toBeVisible();
-  await expect(page.getByRole('link', { name: 'Tarifas' })).toHaveCount(0);
+
+  // En el menu el cliente solo tiene Reservas: ni Tarifas ni el desplegable de Configuracion
+  const menu = await abrirMenu(page);
+  await expect(menu.getByRole('link', { name: 'Reservas' })).toBeVisible();
+  await expect(menu.getByRole('link', { name: 'Tarifas' })).toHaveCount(0);
+  await expect(menu.getByRole('button', { name: 'Configuración' })).toHaveCount(0);
 });
 
 test('credenciales incorrectas muestran un error', async ({ page }) => {
@@ -40,19 +45,25 @@ test('un cliente se registra, cierra sesion y el admin lo da de baja', async ({ 
   await page.getByRole('button', { name: 'Crear cuenta' }).click();
 
   await expect(page).toHaveURL(/\/reservas$/);
-  await expect(page.getByRole('banner').getByText(nombre)).toBeVisible();
+  // El nombre del usuario logueado esta en el encabezado (escritorio) o en el menu lateral (celular)
+  await expect((await abrirMenu(page)).getByText(nombre)).toBeVisible();
+  if (esCelular(page)) await page.keyboard.press('Escape');
 
-  await page.getByRole('button', { name: 'Salir' }).click();
-  await expect(page).toHaveURL(/\/login$/);
+  await salir(page);
 
   await ingresar(page, ADMIN);
-  await page.getByRole('link', { name: 'Usuarios' }).click();
-  await expect(page.getByRole('cell', { name: nombre, exact: true })).toBeVisible();
+  await irA(page, 'Usuarios');
+  // En celular los usuarios se ven como tarjetas y en escritorio como tabla: se busca lo visible
+  const usuario = page.getByText(nombre, { exact: true }).filter({ visible: true });
+  await expect(usuario).toBeVisible();
 
-  await page.getByRole('button', { name: `Eliminar a ${nombre}` }).click();
+  await page
+    .getByRole('button', { name: `Eliminar a ${nombre}` })
+    .filter({ visible: true })
+    .click();
   await page.getByRole('alertdialog').getByRole('button', { name: 'Eliminar' }).click();
 
-  await expect(page.getByRole('cell', { name: nombre, exact: true })).toHaveCount(0);
+  await expect(usuario).toHaveCount(0);
 });
 
 test('la sesion viaja en una cookie httpOnly, sobrevive a recargar y se borra al salir', async ({
@@ -68,11 +79,12 @@ test('la sesion viaja en una cookie httpOnly, sobrevive a recargar y se borra al
   expect(await page.evaluate<string>('document.cookie')).not.toContain('sesion');
   expect(await page.evaluate<number>('localStorage.length')).toBe(0);
 
+  // Al recargar sigue logueado: no vuelve al login
   await page.reload();
-  await expect(page.getByRole('button', { name: 'Salir' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Reservas', level: 1 })).toBeVisible();
+  await expect(page).not.toHaveURL(/\/login$/);
 
-  await page.getByRole('button', { name: 'Salir' }).click();
-  await expect(page).toHaveURL(/\/login$/);
+  await salir(page);
   expect((await context.cookies()).find((cookie) => cookie.name === 'sesion')).toBeUndefined();
 });
 
@@ -82,7 +94,7 @@ test('un cliente entra al alta de reservas y no elige cliente: reserva a su nomb
   await page.goto('/login');
   await ingresar(page, CLIENTE);
 
-  await page.getByRole('link', { name: 'Reservas' }).click();
+  await irA(page, 'Reservas');
   await page.getByRole('link', { name: 'Nueva reserva' }).click();
 
   await expect(page).toHaveURL(/\/reservas\/nueva$/);
