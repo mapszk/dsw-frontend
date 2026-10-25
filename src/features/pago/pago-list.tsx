@@ -11,13 +11,8 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { formatFechaHora, formatMoneda } from '@/lib/format';
-import type { MetodoPago, PagoListado } from './pago.service';
-
-const METODO_LABEL: Record<MetodoPago, string> = {
-  EFECTIVO: 'Efectivo',
-  TARJETA: 'Tarjeta',
-  TRANSFERENCIA: 'Transferencia',
-};
+import { ESTADO_PAGO_LABEL, METODO_PAGO_LABEL, VARIANTE_ESTADO_PAGO } from './etiquetas-pago';
+import type { PagoListado } from './pago.service';
 
 interface PagoListProps {
   pagos: PagoListado[];
@@ -35,11 +30,14 @@ export function PagoList({ pagos }: PagoListProps) {
               className="hover:bg-muted/50 flex items-center justify-between gap-3 rounded-lg border p-3"
             >
               <div className="flex min-w-0 flex-col gap-1">
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <span className="font-mono font-medium">
                     {pago.reserva?.patente ?? `Reserva #${pago.reservaId}`}
                   </span>
-                  <Badge variant="secondary">{METODO_LABEL[pago.metodo]}</Badge>
+                  <Badge variant="secondary">{METODO_PAGO_LABEL[pago.metodo]}</Badge>
+                  <Badge variant={VARIANTE_ESTADO_PAGO[pago.estado]}>
+                    {ESTADO_PAGO_LABEL[pago.estado]}
+                  </Badge>
                 </div>
                 <p className="text-muted-foreground text-xs">{formatFechaHora(pago.fecha)}</p>
                 <p className="text-muted-foreground text-xs">Reserva #{pago.reservaId}</p>
@@ -62,6 +60,7 @@ export function PagoList({ pagos }: PagoListProps) {
               <TableHead>Reserva</TableHead>
               <TableHead>Patente</TableHead>
               <TableHead>Método</TableHead>
+              <TableHead>Estado</TableHead>
               <TableHead className="text-right">Monto</TableHead>
               <TableHead>
                 <span className="sr-only">Acciones</span>
@@ -77,7 +76,12 @@ export function PagoList({ pagos }: PagoListProps) {
                   {pago.reserva?.patente ?? '-'}
                 </TableCell>
                 <TableCell>
-                  <Badge variant="secondary">{METODO_LABEL[pago.metodo]}</Badge>
+                  <Badge variant="secondary">{METODO_PAGO_LABEL[pago.metodo]}</Badge>
+                </TableCell>
+                <TableCell>
+                  <Badge variant={VARIANTE_ESTADO_PAGO[pago.estado]}>
+                    {ESTADO_PAGO_LABEL[pago.estado]}
+                  </Badge>
                 </TableCell>
                 <TableCell className="text-right font-medium">
                   {formatMoneda(Number(pago.monto))}

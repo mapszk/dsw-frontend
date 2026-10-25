@@ -7,7 +7,7 @@ import { RegistrarPagoButton } from './reserva-acciones';
 
 const METODO_PAGO_LABEL: Record<MetodoPago, string> = {
   EFECTIVO: 'Efectivo',
-  TARJETA: 'Tarjeta',
+  MERCADOPAGO: 'MercadoPago',
   TRANSFERENCIA: 'Transferencia',
 };
 

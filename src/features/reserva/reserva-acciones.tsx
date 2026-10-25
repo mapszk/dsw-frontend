@@ -29,13 +29,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { METODOS_PAGO, type MetodoPago } from '@/features/pago/pago.service';
+import {
+  METODOS_PAGO_MANUALES,
+  type MetodoPago,
+  type MetodoPagoManual,
+} from '@/features/pago/pago.service';
 import { useAprobarReserva, useRegistrarPago } from './use-reserva-acciones';
 
 const ETIQUETAS: Record<MetodoPago, string> = {
   EFECTIVO: 'Efectivo',
-  TARJETA: 'Tarjeta',
   TRANSFERENCIA: 'Transferencia',
+  MERCADOPAGO: 'MercadoPago',
 };
 
 /** El ADMIN aprueba una reserva pendiente: pasa a activa */
@@ -65,10 +69,10 @@ export function AprobarReservaButton({ reservaId }: { reservaId: number }) {
   );
 }
 
-/** CU2: el ADMIN registra el pago de una reserva activa y pasa a pagada */
+/** CU2: el ADMIN registra el pago (efectivo o transferencia) de una reserva activa y pasa a pagada */
 export function RegistrarPagoButton({ reservaId }: { reservaId: number }) {
   const [abierto, setAbierto] = useState(false);
-  const [metodo, setMetodo] = useState<MetodoPago>('EFECTIVO');
+  const [metodo, setMetodo] = useState<MetodoPagoManual>('EFECTIVO');
   const registrar = useRegistrarPago();
 
   return (
@@ -85,12 +89,12 @@ export function RegistrarPagoButton({ reservaId }: { reservaId: number }) {
         </DialogHeader>
         <div className="space-y-2">
           <Label htmlFor="metodo-pago">Método de pago</Label>
-          <Select value={metodo} onValueChange={(valor) => setMetodo(valor as MetodoPago)}>
+          <Select value={metodo} onValueChange={(valor) => setMetodo(valor as MetodoPagoManual)}>
             <SelectTrigger id="metodo-pago" className="w-full">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {METODOS_PAGO.map((opcion) => (
+              {METODOS_PAGO_MANUALES.map((opcion) => (
                 <SelectItem key={opcion} value={opcion}>
                   {ETIQUETAS[opcion]}
                 </SelectItem>

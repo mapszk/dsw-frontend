@@ -11,8 +11,15 @@ export type EstadoReserva = (typeof ESTADOS_RESERVA)[number];
 export const ESTADOS_COCHERA = ['DISPONIBLE', 'INHABILITADA'] as const;
 export type EstadoCochera = (typeof ESTADOS_COCHERA)[number];
 
-export const METODOS_PAGO = ['EFECTIVO', 'TARJETA', 'TRANSFERENCIA'] as const;
+export const METODOS_PAGO = ['EFECTIVO', 'TRANSFERENCIA', 'MERCADOPAGO'] as const;
 export type MetodoPago = (typeof METODOS_PAGO)[number];
+
+// El admin solo registra a mano efectivo y transferencia: MercadoPago lo inicia el usuario
+export const METODOS_PAGO_MANUALES = ['EFECTIVO', 'TRANSFERENCIA'] as const;
+export type MetodoPagoManual = (typeof METODOS_PAGO_MANUALES)[number];
+
+export const ESTADOS_PAGO = ['PENDIENTE', 'APROBADO', 'RECHAZADO'] as const;
+export type EstadoPago = (typeof ESTADOS_PAGO)[number];
 
 interface Timestamps {
   createdAt: string;
@@ -82,5 +89,6 @@ export interface Pago {
   id: number;
   fecha: string;
   metodo: MetodoPago;
+  estado: EstadoPago;
   monto: number;
 }

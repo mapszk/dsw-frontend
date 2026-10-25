@@ -1,6 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
-import { pagoService } from './pago.service';
+import { pagoService, type FiltrosPagos } from './pago.service';
 
-export function usePagos() {
-  return useQuery({ queryKey: ['pagos'], queryFn: () => pagoService.list() });
+export function usePagos(filtros: FiltrosPagos = {}) {
+  return useQuery({
+    queryKey: ['pagos', filtros],
+    queryFn: () => pagoService.list(filtros),
+  });
 }
