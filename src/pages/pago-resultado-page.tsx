@@ -2,8 +2,10 @@ import { Link, useSearchParams } from 'react-router';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useResultadoPago, type EstadoPago } from '@/features/pago/use-resultado-pago';
+import { ESTADO_PAGO_LABEL, VARIANTE_ESTADO_PAGO } from '@/features/pago/etiquetas-pago';
+import { useResultadoPago } from '@/features/pago/use-resultado-pago';
 import { formatMoneda } from '@/lib/format';
+import type { EstadoPago } from '@/types/models';
 
 type Retorno = 'exito' | 'fallo' | 'pendiente';
 
@@ -17,12 +19,6 @@ const MENSAJE: Record<EstadoPago, string> = {
   APROBADO: 'El pago fue aprobado y la reserva figura como pagada.',
   PENDIENTE: 'Estamos esperando la confirmación de MercadoPago. Esta pantalla se actualiza sola.',
   RECHAZADO: 'El pago fue rechazado. Podés volver a intentarlo desde la reserva.',
-};
-
-const VARIANTE: Record<EstadoPago, 'default' | 'secondary' | 'destructive'> = {
-  APROBADO: 'default',
-  PENDIENTE: 'secondary',
-  RECHAZADO: 'destructive',
 };
 
 function ResultadoPago({ retorno }: { retorno: Retorno }) {
@@ -62,8 +58,8 @@ function ResultadoPago({ retorno }: { retorno: Retorno }) {
               </p>
               {resultado.data.pago?.estado ? (
                 <>
-                  <Badge variant={VARIANTE[resultado.data.pago.estado]}>
-                    {resultado.data.pago.estado}
+                  <Badge variant={VARIANTE_ESTADO_PAGO[resultado.data.pago.estado]}>
+                    {ESTADO_PAGO_LABEL[resultado.data.pago.estado]}
                   </Badge>
                   <p className="text-sm">{MENSAJE[resultado.data.pago.estado]}</p>
                   <p className="text-muted-foreground text-sm">
