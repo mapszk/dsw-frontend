@@ -4,6 +4,9 @@ import { formatDuracion } from '@/lib/duracion';
 import { formatFechaHora, formatMoneda } from '@/lib/format';
 import type { MetodoPago, Reserva } from '@/types/models';
 import { RegistrarPagoButton } from './reserva-acciones';
+import { PagarConMercadoPago } from '@/features/pago/pagar-con-mercadopago';
+import { ESTADO_PAGO_LABEL } from '@/features/pago/etiquetas-pago';
+
 
 const METODO_PAGO_LABEL: Record<MetodoPago, string> = {
   EFECTIVO: 'Efectivo',
@@ -77,7 +80,7 @@ export function ReservaDetalle({ reserva }: { reserva: Reserva }) {
         </CardContent>
       </Card>
 
-      <Card className="md:col-span-2">
+            <Card className="md:col-span-2">
         <CardHeader>
           <CardTitle>Pago</CardTitle>
         </CardHeader>
@@ -86,6 +89,7 @@ export function ReservaDetalle({ reserva }: { reserva: Reserva }) {
             <dl className="grid grid-cols-2 gap-4 lg:grid-cols-4">
               <Dato label="Fecha">{formatFechaHora(pago.fecha)}</Dato>
               <Dato label="Método">{METODO_PAGO_LABEL[pago.metodo]}</Dato>
+              <Dato label="Estado">{ESTADO_PAGO_LABEL[pago.estado]}</Dato>
               <Dato label="Monto">{formatMoneda(pago.monto)}</Dato>
             </dl>
           ) : (
@@ -95,6 +99,13 @@ export function ReservaDetalle({ reserva }: { reserva: Reserva }) {
           )}
           {sesion?.rol === 'ADMIN' && reserva.estado === 'ACTIVA' && (
             <RegistrarPagoButton reservaId={reserva.id} />
+          )}
+          {sesion?.rol === 'CLIENTE' && (
+            <PagarConMercadoPago
+              reservaId={reserva.id}
+              estadoReserva={reserva.estado}
+              pagoAprobado={pago?.estado === 'APROBADO'}
+            />
           )}
         </CardContent>
       </Card>
