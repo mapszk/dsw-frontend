@@ -1,9 +1,11 @@
+
 import { createBrowserRouter, Navigate } from 'react-router';
 import { AppLayout } from '@/components/layout/app-layout';
 import { GuestOnly, RequireAuth } from '@/features/auth/route-guards';
 import { LoginPage } from '@/pages/login-page';
 import { NotFoundPage } from '@/pages/not-found-page';
 import { NuevaReservaPage } from '@/pages/nueva-reserva-page';
+import { PagoResultadoPage } from '@/pages/pago-resultado-page';
 import { RegistroPage } from '@/pages/registro-page';
 import { ReservaDetallePage } from '@/pages/reserva-detalle-page';
 import { ReservasPage } from '@/pages/reservas-page';
@@ -15,7 +17,6 @@ import { CocherasPage } from '@/pages/cocheras-page';
 import { PagosPage } from '@/pages/pagos-page';
 import { PlayasPage } from '@/pages/playas-page';
 
-
 export const router = createBrowserRouter([
   {
     element: <AppLayout />,
@@ -25,34 +26,82 @@ export const router = createBrowserRouter([
         children: [
           { path: '/login', element: <LoginPage /> },
           { path: '/registro', element: <RegistroPage /> },
-
         ],
       },
       {
-        // Cualquier usuario logueado. Las secciones de un solo rol van en <RequireAuth roles={[...]} />
+        // Rutas disponibles para cualquier usuario autenticado.
         element: <RequireAuth />,
-        // La API filtra las reservas: un CLIENTE solo ve las suyas
         children: [
-          { path: '/', element: <Navigate to="/reservas" replace /> },
-          { path: '/reservas', element: <ReservasPage /> },
-          // Un ADMIN elige el cliente; un CLIENTE reserva a su nombre
-          { path: '/reservas/nueva', element: <NuevaReservaPage /> },
-          { path: '/reservas/:id', element: <ReservaDetallePage /> },
+          {
+            path: '/',
+            element: <Navigate to="/reservas" replace />,
+          },
+          {
+            path: '/reservas',
+            element: <ReservasPage />,
+          },
+          {
+            path: '/reservas/nueva',
+            element: <NuevaReservaPage />,
+          },
+          {
+            path: '/reservas/:id',
+            element: <ReservaDetallePage />,
+          },
+
+          // Retornos de MercadoPago.
+          {
+            path: '/pago/exito',
+            element: <PagoResultadoPage tipo="exito" />,
+          },
+          {
+            path: '/pago/fallo',
+            element: <PagoResultadoPage tipo="fallo" />,
+          },
+          {
+            path: '/pago/pendiente',
+            element: <PagoResultadoPage tipo="pendiente" />,
+          },
         ],
       },
       {
+        // Rutas exclusivas del administrador.
         element: <RequireAuth roles={['ADMIN']} />,
         children: [
-          { path: '/usuarios', element: <UsuariosPage /> },
-          { path: '/tipos-vehiculo', element: <TiposVehiculoPage /> },
-          { path: '/tipos-estadia', element: <TiposEstadiaPage /> },
-          { path: '/tarifas', element: <TarifasPage /> },
-          { path: '/cocheras', element: <CocherasPage /> },
-          { path: '/pagos', element: <PagosPage /> },
-          { path: '/playas', element: <PlayasPage /> },
+          {
+            path: '/usuarios',
+            element: <UsuariosPage />,
+          },
+          {
+            path: '/tipos-vehiculo',
+            element: <TiposVehiculoPage />,
+          },
+          {
+            path: '/tipos-estadia',
+            element: <TiposEstadiaPage />,
+          },
+          {
+            path: '/tarifas',
+            element: <TarifasPage />,
+          },
+          {
+            path: '/cocheras',
+            element: <CocherasPage />,
+          },
+          {
+            path: '/pagos',
+            element: <PagosPage />,
+          },
+          {
+            path: '/playas',
+            element: <PlayasPage />,
+          },
         ],
       },
-      { path: '*', element: <NotFoundPage /> },
+      {
+        path: '*',
+        element: <NotFoundPage />,
+      },
     ],
   },
 ]);

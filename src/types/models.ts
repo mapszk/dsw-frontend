@@ -11,7 +11,12 @@ export type EstadoReserva = (typeof ESTADOS_RESERVA)[number];
 export const ESTADOS_COCHERA = ['DISPONIBLE', 'INHABILITADA'] as const;
 export type EstadoCochera = (typeof ESTADOS_COCHERA)[number];
 
-export const METODOS_PAGO = ['EFECTIVO', 'TARJETA', 'TRANSFERENCIA'] as const;
+export const METODOS_PAGO = [
+  'EFECTIVO',
+  'TARJETA',
+  'TRANSFERENCIA',
+  'ONLINE',
+] as const;
 export type MetodoPago = (typeof METODOS_PAGO)[number];
 
 interface Timestamps {
@@ -83,4 +88,5 @@ export interface Pago {
   fecha: string;
   metodo: MetodoPago;
   monto: number;
+  estado: 'PENDIENTE' | 'APROBADO' | 'RECHAZADO';
 }
