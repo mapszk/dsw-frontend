@@ -8,7 +8,7 @@ import {
 import { useAuth } from '@/features/auth/use-auth';
 import { formatDuracion } from '@/lib/duracion';
 import { formatFechaHora, formatMoneda } from '@/lib/format';
-import type { MetodoPago, Reserva } from '@/types/models';
+import type { MetodoPago, Pago, Reserva } from '@/types/models';
 import {
   PagarConMercadoPagoButton,
   RegistrarPagoButton,
@@ -19,6 +19,12 @@ const METODO_PAGO_LABEL: Record<MetodoPago, string> = {
   TARJETA: 'Tarjeta',
   TRANSFERENCIA: 'Transferencia',
   ONLINE: 'MercadoPago',
+};
+
+const ESTADO_PAGO_LABEL: Record<Pago['estado'], string> = {
+  PENDIENTE: 'Pendiente',
+  APROBADO: 'Aprobado',
+  RECHAZADO: 'Rechazado',
 };
 
 interface DatoProps {
@@ -43,10 +49,12 @@ export function ReservaDetalle({ reserva }: { reserva: Reserva }) {
   const esAdmin = sesion?.rol === 'ADMIN';
   const reservaActiva = reserva.estado === 'ACTIVA';
 
-  const puedePagarConMercadoPago =
-    reservaActiva && (!pago || pago.estado !== 'APROBADO');
+  // Un pago online rechazado no bloquea: se puede volver a pagar o registrar el pago a mano
+  const sinPagoAprobado = pago?.estado !== 'APROBADO';
 
-  const puedeRegistrarPagoManual = reservaActiva && !pago && esAdmin;
+  const puedePagarConMercadoPago = reservaActiva && sinPagoAprobado;
+
+  const puedeRegistrarPagoManual = reservaActiva && sinPagoAprobado && esAdmin;
 
   return (
     <div className="grid gap-4 md:grid-cols-2">
@@ -117,7 +125,7 @@ export function ReservaDetalle({ reserva }: { reserva: Reserva }) {
                 {METODO_PAGO_LABEL[pago.metodo]}
               </Dato>
               <Dato label="Monto">{formatMoneda(pago.monto)}</Dato>
-              <Dato label="Estado">{pago.estado}</Dato>
+              <Dato label="Estado">{ESTADO_PAGO_LABEL[pago.estado]}</Dato>
             </dl>
           ) : (
             <p className="text-muted-foreground text-sm">
@@ -133,7 +141,7 @@ export function ReservaDetalle({ reserva }: { reserva: Reserva }) {
             <RegistrarPagoButton reservaId={reserva.id} />
           )}
 
-          {reservaActiva && !pago && esPropietario && (
+          {reservaActiva && sinPagoAprobado && esPropietario && (
             <p className="text-muted-foreground text-sm">
               Si preferís pagar en efectivo o por transferencia, coordiná el pago
               con la administración.
