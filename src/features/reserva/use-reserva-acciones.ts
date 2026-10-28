@@ -2,38 +2,14 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import type { MetodoPago } from '@/features/pago/pago.service';
+import { ApiError } from '@/lib/api-client';
 import { reservaAccionesService } from './reserva-acciones.service';
 
-interface ErrorDeApi {
-  status?: number;
-  response?: {
-    status?: number;
-  };
-}
-
-function obtenerEstadoHttp(error: unknown): number | undefined {
-  if (typeof error !== 'object' || error === null) {
-    return undefined;
-  }
-
-  const errorApi = error as ErrorDeApi;
-
-  return errorApi.status ?? errorApi.response?.status;
-}
-
+// En los 400 y 409 el mensaje de la API ya dice el motivo (ej. "La reserva tiene un pago online
+// en proceso"), así que se muestra tal cual
 function mensajeDe(error: unknown): string {
-  const estado = obtenerEstadoHttp(error);
-
-  if (estado === 403) {
+  if (error instanceof ApiError && error.status === 403) {
     return 'No tenés permisos para realizar esta operación.';
-  }
-
-  if (estado === 409) {
-    return 'No se puede realizar esta operación porque la reserva o el pago ya cambió de estado. Actualizá la página e intentá nuevamente.';
-  }
-
-  if (estado === 400) {
-    return 'Los datos enviados no son válidos. Revisá la información e intentá nuevamente.';
   }
 
   return error instanceof Error
