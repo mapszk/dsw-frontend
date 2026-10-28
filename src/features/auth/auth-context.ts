@@ -6,6 +6,10 @@ export interface AuthContextValue {
   usuario: Usuario | null;
   /** Todavia se esta preguntando a la API si hay una sesion abierta */
   isLoading: boolean;
+  /** No se pudo averiguar la sesion (API caida o despertando): no es lo mismo que no tener sesion */
+  sinConexion: boolean;
+  /** Vuelve a preguntar a la API por la sesion */
+  reintentar: () => void;
   /** Se llama despues del login o registro: la API ya dejo la cookie de sesion */
   iniciarSesion: (usuario: Usuario) => void;
   cerrarSesion: () => Promise<void>;

@@ -25,7 +25,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     queryKey: perfilKey,
     queryFn: obtenerPerfil,
     staleTime: Infinity,
-    retry: false,
+    // Un 401 ya se resolvio en obtenerPerfil. Si la API esta despertando (5xx, timeout) se le da
+    // mas margen que al resto de las consultas antes de mostrar el error
+    retry: (failureCount, error) =>
+      !(error instanceof ApiError && error.status >= 400 && error.status < 500) && failureCount < 4,
+    retryDelay: (intento) => Math.min(1000 * 2 ** intento, 10_000),
   });
 
   const terminarSesion = useCallback(() => {
@@ -41,6 +45,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     () => ({
       usuario: perfil.data ?? null,
       isLoading: perfil.isPending,
+      sinConexion: perfil.isError,
+      reintentar() {
+        void perfil.refetch();
+      },
       iniciarSesion(usuario: Usuario) {
         queryClient.setQueryData(perfilKey, usuario);
       },
@@ -53,7 +61,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
       },
     }),
-    [perfil.data, perfil.isPending, queryClient, terminarSesion],
+    [perfil, queryClient, terminarSesion],
   );
 
   return <AuthContext value={value}>{children}</AuthContext>;

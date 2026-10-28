@@ -12,7 +12,7 @@ interface RequireAuthProps {
 
 /** Protege rutas: sin sesion lleva al login (y vuelve despues); con otro rol muestra un aviso. */
 export function RequireAuth({ roles, children }: RequireAuthProps) {
-  const { usuario, isLoading } = useAuth();
+  const { usuario, isLoading, sinConexion, reintentar } = useAuth();
   const location = useLocation();
 
   if (isLoading) {
@@ -20,6 +20,19 @@ export function RequireAuth({ roles, children }: RequireAuthProps) {
       <p role="status" className="text-muted-foreground py-16 text-center">
         Cargando sesión...
       </p>
+    );
+  }
+
+  // Sin respuesta de la API no se sabe si hay sesion: mandar al login la perderia sin motivo
+  if (sinConexion) {
+    return (
+      <section className="flex flex-col items-center gap-4 py-16 text-center">
+        <h1 className="font-heading text-2xl font-semibold">No se pudo conectar</h1>
+        <p className="text-muted-foreground">
+          El servidor no respondió. Puede tardar unos segundos en iniciar.
+        </p>
+        <Button onClick={reintentar}>Reintentar</Button>
+      </section>
     );
   }
 
@@ -50,7 +63,9 @@ export function GuestOnly() {
 
   if (isLoading) return null;
   if (usuario) {
-    const destino = (location.state as { from?: Location } | null)?.from?.pathname ?? '/reservas';
+    // Con la query incluida: por ejemplo, la vuelta de MercadoPago trae la reserva en ella
+    const from = (location.state as { from?: Location } | null)?.from;
+    const destino = from ? `${from.pathname}${from.search ?? ''}` : '/reservas';
     return <Navigate to={destino} replace />;
   }
   return <Outlet />;

@@ -16,10 +16,12 @@ const cliente: Usuario = {
   rol: 'CLIENTE',
 };
 
-function sesion(usuario: Usuario | null, isLoading = false) {
+function sesion(usuario: Usuario | null, isLoading = false, sinConexion = false) {
   vi.mocked(useAuth).mockReturnValue({
     usuario,
     isLoading,
+    sinConexion,
+    reintentar: vi.fn(),
     iniciarSesion: vi.fn(),
     cerrarSesion: vi.fn(),
   } satisfies AuthContextValue);
@@ -44,6 +46,7 @@ function renderRuta(ruta: string | { pathname: string; state: unknown }) {
     { initialEntries: [ruta] },
   );
   render(<RouterProvider router={router} />);
+  return router;
 }
 
 describe('RequireAuth y GuestOnly', () => {
@@ -95,5 +98,24 @@ describe('RequireAuth y GuestOnly', () => {
     renderRuta({ pathname: '/login', state: { from: { pathname: '/admin' } } });
 
     expect(screen.getByText('Seccion de admin')).toBeInTheDocument();
+  });
+
+  it('si la API no responde no manda al login', () => {
+    sesion(null, false, true);
+    renderRuta('/reservas');
+
+    expect(screen.getByRole('heading', { name: 'No se pudo conectar' })).toBeInTheDocument();
+    expect(screen.queryByText('Pantalla de login')).not.toBeInTheDocument();
+  });
+
+  it('al iniciar sesion conserva la query de la ruta pedida', () => {
+    sesion(cliente);
+    const router = renderRuta({
+      pathname: '/login',
+      state: { from: { pathname: '/reservas', search: '?external_reference=1' } },
+    });
+
+    expect(screen.getByText('Reservas')).toBeInTheDocument();
+    expect(router.state.location.search).toBe('?external_reference=1');
   });
 });
